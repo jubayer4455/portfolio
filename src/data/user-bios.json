@@ -98,27 +98,7 @@
     "location": "Dhaka, Bangladesh",
     "phone": "+880 1700 123456",
     "email": "jubayer@portfolio.com",
-    "whatsapp_enabled": true,
-    "whatsapp_number": "+880 1700 123456",
-    "whatsapp_status": "Online • Direct WhatsApp Chat",
-    "whatsapp_message": "Hi Jubayer, I visited your 3D bio page and wanted to connect with you!",
     "social_links": [
-      {
-        "id": "1",
-        "platform": "GitHub",
-        "display_label": "github.com/jubayer",
-        "profile_url": "https://github.com",
-        "icon_name": "Github",
-        "color": "#ffffff"
-      },
-      {
-        "id": "2",
-        "platform": "LinkedIn",
-        "display_label": "linkedin.com/in/jubayer",
-        "profile_url": "https://linkedin.com",
-        "icon_name": "Linkedin",
-        "color": "#0A66C2"
-      },
       {
         "id": "3",
         "platform": "Facebook",
@@ -148,21 +128,21 @@
         "caption": "Product Strategy & Architecture 📐"
       }
     ],
-    "theme": "orange",
-    "font_family": "sans",
-    "bg_3d_style": "particles",
+    "theme": "rose",
+    "font_family": "serif",
+    "bg_3d_style": "orbit",
     "status_badge": "🟢 Available for high-impact projects",
     "music_enabled": true,
-    "music_title": "Synthwave Focus Flow 🎧",
-    "music_url": "https://assets.mixkit.co/music/preview/mixkit-chill-bro-494.mp3",
-    "layout_style": "bento",
-    "views": 420,
+    "music_title": "Synthwave Breeze 🌊",
+    "music_url": "https://assets.mixkit.co/music/preview/mixkit-synthwave-breeze-642.mp3",
+    "layout_style": "classic",
+    "views": 422,
     "clicks": 184,
     "is_verified": true,
-    "is_featured": true,
     "is_suspended": false,
+    "is_featured": true,
     "created_at": "2026-10-11T07:59:06.802Z",
-    "updated_at": "2026-10-11T12:15:00.000Z"
+    "updated_at": "2026-10-11T13:36:51.811Z"
   },
   {
     "id": "bio-1791712086484",

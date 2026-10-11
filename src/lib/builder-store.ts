@@ -1,6 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import os from 'os'
+import { revalidatePath } from 'next/cache'
 import { createClient as createServiceClient } from '@supabase/supabase-js'
 
 export interface UserBioData {
@@ -133,6 +134,21 @@ export async function getUserBioByUsername(username: string): Promise<UserBioDat
         return data as UserBioData
       }
     } catch {}
+
+    try {
+      const { data } = await supabase
+        .from('site_settings')
+        .select('value')
+        .eq('key', 'all_user_bios_json')
+        .single()
+      if (data?.value) {
+        const parsed = JSON.parse(data.value) as UserBioData[]
+        const found = parsed.find(
+          (b) => (b.username || '').replace(/^@+/, '').trim().toLowerCase() === clean
+        )
+        if (found) return found
+      }
+    } catch {}
   }
 
   const all = readAllUserBios()
@@ -155,6 +171,19 @@ export async function getUserBioByUserId(userId: string): Promise<UserBioData | 
         .maybeSingle()
       if (!error && data) {
         return data as UserBioData
+      }
+    } catch {}
+
+    try {
+      const { data } = await supabase
+        .from('site_settings')
+        .select('value')
+        .eq('key', 'all_user_bios_json')
+        .single()
+      if (data?.value) {
+        const parsed = JSON.parse(data.value) as UserBioData[]
+        const found = parsed.find((b) => b.user_id === userId)
+        if (found) return found
       }
     } catch {}
   }
@@ -229,10 +258,24 @@ export async function saveUserBio(bio: Partial<UserBioData> & { user_id: string;
         },
         { onConflict: 'username' }
       )
-    } catch (err) {
-      console.warn('Supabase user_bios upsert error (using local store):', err)
-    }
+    } catch {}
+
+    // Always mirror to site_settings for serverless persistence
+    try {
+      await supabase.from('site_settings').upsert({
+        key: 'all_user_bios_json',
+        value: JSON.stringify(all),
+        updated_at: now,
+      })
+    } catch {}
   }
+
+  try {
+    revalidatePath('/')
+    revalidatePath(`/u/${cleanUser}`)
+    revalidatePath('/dashboard')
+    revalidatePath('/admin/users')
+  } catch {}
 
   return record
 }
@@ -247,6 +290,20 @@ export async function getAllUserBios(): Promise<UserBioData[]> {
         .order('created_at', { ascending: false })
       if (!error && data && data.length > 0) {
         return data as UserBioData[]
+      }
+    } catch {}
+
+    try {
+      const { data } = await supabase
+        .from('site_settings')
+        .select('value')
+        .eq('key', 'all_user_bios_json')
+        .single()
+      if (data?.value) {
+        const parsed = JSON.parse(data.value) as UserBioData[]
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed
+        }
       }
     } catch {}
   }
