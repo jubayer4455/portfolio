@@ -1,0 +1,78 @@
+[
+  {
+    "id": "proj-1",
+    "title": "NextGen E-Commerce Superstore",
+    "url": "https://nextjs.org/commerce",
+    "description": "High-performance modern e-commerce storefront with dynamic cart, instant checkout, and responsive design.",
+    "category": "E-Commerce",
+    "logo_url": "https://www.google.com/s2/favicons?domain=nextjs.org&sz=128",
+    "preview_image": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80",
+    "tags": [
+      "Next.js",
+      "Tailwind CSS",
+      "TypeScript",
+      "Stripe"
+    ],
+    "is_featured": true,
+    "sort_order": 1,
+    "clicks": 144,
+    "created_at": "2026-01-15T10:00:00.000Z"
+  },
+  {
+    "id": "proj-2",
+    "title": "Creative Studio Agency Hub",
+    "url": "https://vercel.com",
+    "description": "Interactive digital agency portfolio with smooth Framer Motion animations, dark aesthetics, and CMS integration.",
+    "category": "Agency & Portfolio",
+    "logo_url": "https://www.google.com/s2/favicons?domain=vercel.com&sz=128",
+    "preview_image": "https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=800&q=80",
+    "tags": [
+      "React",
+      "Framer Motion",
+      "UI/UX",
+      "Tailwind"
+    ],
+    "is_featured": true,
+    "sort_order": 2,
+    "clicks": 98,
+    "created_at": "2026-02-10T12:30:00.000Z"
+  },
+  {
+    "id": "proj-3",
+    "title": "Cloud Analytics SaaS Dashboard",
+    "url": "https://supabase.com",
+    "description": "Full-stack cloud analytics SaaS platform featuring real-time data visualizer, user authentication, and multi-tenant billing.",
+    "category": "SaaS Platform",
+    "logo_url": "https://www.google.com/s2/favicons?domain=supabase.com&sz=128",
+    "preview_image": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80",
+    "tags": [
+      "Next.js",
+      "Supabase",
+      "PostgreSQL",
+      "Recharts"
+    ],
+    "is_featured": true,
+    "sort_order": 3,
+    "clicks": 87,
+    "created_at": "2026-03-01T15:00:00.000Z"
+  },
+  {
+    "id": "proj-4",
+    "title": "Developer Tech Blog & Knowledge Base",
+    "url": "https://github.com",
+    "description": "Fast markdown-driven tech publication and developer resource portal with code highlighting and full-text search.",
+    "category": "Web Publication",
+    "logo_url": "https://www.google.com/s2/favicons?domain=github.com&sz=128",
+    "preview_image": "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=800&q=80",
+    "tags": [
+      "Markdown",
+      "SEO",
+      "TypeScript",
+      "Tailwind"
+    ],
+    "is_featured": true,
+    "sort_order": 4,
+    "clicks": 64,
+    "created_at": "2026-03-20T09:20:00.000Z"
+  }
+]

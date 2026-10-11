@@ -1,0 +1,62 @@
+[
+  {
+    "id": "demo-user-123",
+    "email": "sarah@bio.com",
+    "username": "sarah",
+    "displayName": "Sarah Rahman",
+    "salt": "aj-secure-salt-2026",
+    "passwordHash": "86924c8e234516d07e8a7c2c9961d50c681fa78fca62def9be6d5d85d986c17d",
+    "createdAt": "2026-10-10T10:00:00.000Z",
+    "updatedAt": "2026-10-11T12:26:16.195Z"
+  },
+  {
+    "id": "3c04c4e0-1653-4037-af3b-32b7c5c36a16",
+    "email": "jubayer@bio.com",
+    "username": "jubayer",
+    "displayName": "Abdul Al Jubayer",
+    "salt": "aj-secure-salt-2026",
+    "passwordHash": "cc5955f513c8816f67b1a905963b5bcf9653459b27f45e515624d0c4bea26912",
+    "createdAt": "2026-10-11T07:59:06.802Z",
+    "updatedAt": "2026-10-11T13:33:24.915Z"
+  },
+  {
+    "id": "user-farhan-101",
+    "email": "farhan@designlab.co",
+    "username": "farhan",
+    "displayName": "Farhan Kabir",
+    "salt": "aj-secure-salt-2026",
+    "passwordHash": "86924c8e234516d07e8a7c2c9961d50c681fa78fca62def9be6d5d85d986c17d",
+    "createdAt": "2026-10-11T09:48:06.483Z",
+    "updatedAt": "2026-10-11T09:48:06.483Z"
+  },
+  {
+    "id": "user-alex-102",
+    "email": "alex@rivera.studio",
+    "username": "alex",
+    "displayName": "Alex Rivera",
+    "salt": "aj-secure-salt-2026",
+    "passwordHash": "86924c8e234516d07e8a7c2c9961d50c681fa78fca62def9be6d5d85d986c17d",
+    "createdAt": "2026-10-11T11:29:52.287Z",
+    "updatedAt": "2026-10-11T11:29:52.287Z"
+  },
+  {
+    "id": "user-1791721576292",
+    "email": "creator_917@gmail.com",
+    "username": "creator_917",
+    "displayName": "Creator_917",
+    "passwordHash": "af8b208af8d8c02436304f970aa3df82ad2bf16a504d7d4121176b5bf25d8db3",
+    "salt": "62fbf629e10d7c931d311d6dca977371",
+    "createdAt": "2026-10-11T12:26:16.292Z",
+    "updatedAt": "2026-10-11T12:26:16.292Z"
+  },
+  {
+    "id": "user-1791722311265",
+    "email": "admin@portfolio.com",
+    "username": "admin",
+    "displayName": "Admin",
+    "passwordHash": "d80863f5d32675152274272fb03ae3c78b229f353efa76e51d40931c639fcb90",
+    "salt": "3854b3762fd6909a19f23b8e9fa77bac",
+    "createdAt": "2026-10-11T12:38:31.265Z",
+    "updatedAt": "2026-10-11T12:39:27.576Z"
+  }
+]
