@@ -1,9 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
-import { readAllReviews, setReviewApproval, deleteReview } from '@/lib/builder-store'
+import { getAllReviews, setReviewApproval, deleteReview } from '@/lib/builder-store'
 import { createServerClient } from '@supabase/ssr'
 
 export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
+const noCacheHeaders = {
+  'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+  Pragma: 'no-cache',
+  Expires: '0',
+}
 
 async function checkAdminAuth() {
   const cookieStore = await cookies()
@@ -34,11 +41,11 @@ async function checkAdminAuth() {
 export async function GET() {
   const isAuthed = await checkAdminAuth()
   if (!isAuthed) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401, headers: noCacheHeaders })
   }
 
-  const all = readAllReviews()
-  return NextResponse.json({ success: true, data: all })
+  const all = await getAllReviews()
+  return NextResponse.json({ success: true, data: all }, { headers: noCacheHeaders })
 }
 
 export async function PATCH(req: NextRequest) {

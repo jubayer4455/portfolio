@@ -1,18 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server'
 import {
-  readAnonymousMessages,
-  writeAnonymousMessages,
+  getAnonymousMessages,
+  saveAnonymousMessages,
   addAnonymousMessage,
 } from '@/lib/content-store'
 
 export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
+const noCacheHeaders = {
+  'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+  Pragma: 'no-cache',
+  Expires: '0',
+}
 
 export async function GET() {
   try {
-    const list = readAnonymousMessages()
-    return NextResponse.json({ data: list })
+    const list = await getAnonymousMessages()
+    return NextResponse.json({ data: list }, { headers: noCacheHeaders })
   } catch (err: any) {
-    return NextResponse.json({ error: 'Failed to fetch messages' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to fetch messages' }, { status: 500, headers: noCacheHeaders })
   }
 }
 
@@ -24,27 +31,27 @@ export async function POST(req: NextRequest) {
     if (!message || message.trim().length < 2) {
       return NextResponse.json(
         { error: 'Please enter a message (at least 2 characters).' },
-        { status: 400 }
+        { status: 400, headers: noCacheHeaders }
       )
     }
 
     const newMsg = await addAnonymousMessage(message, emoji || '💭')
-    return NextResponse.json({ success: true, data: newMsg })
+    return NextResponse.json({ success: true, data: newMsg }, { headers: noCacheHeaders })
   } catch (err: any) {
     console.error('[messages/anonymous POST] error:', err)
-    return NextResponse.json({ error: 'Failed to send message' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to send message' }, { status: 500, headers: noCacheHeaders })
   }
 }
 
 export async function PATCH(req: NextRequest) {
   try {
     const { id, is_read } = await req.json()
-    const list = readAnonymousMessages()
+    const list = await getAnonymousMessages()
     const updated = list.map((m) => (m.id === id ? { ...m, is_read: !!is_read } : m))
-    writeAnonymousMessages(updated)
-    return NextResponse.json({ success: true })
+    await saveAnonymousMessages(updated)
+    return NextResponse.json({ success: true }, { headers: noCacheHeaders })
   } catch (err: any) {
-    return NextResponse.json({ error: 'Failed to update message' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to update message' }, { status: 500, headers: noCacheHeaders })
   }
 }
 
@@ -52,13 +59,13 @@ export async function DELETE(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url)
     const id = searchParams.get('id')
-    if (!id) return NextResponse.json({ error: 'Missing id' }, { status: 400 })
+    if (!id) return NextResponse.json({ error: 'Missing id' }, { status: 400, headers: noCacheHeaders })
 
-    const list = readAnonymousMessages()
+    const list = await getAnonymousMessages()
     const filtered = list.filter((m) => m.id !== id)
-    writeAnonymousMessages(filtered)
-    return NextResponse.json({ success: true })
+    await saveAnonymousMessages(filtered)
+    return NextResponse.json({ success: true }, { headers: noCacheHeaders })
   } catch (err: any) {
-    return NextResponse.json({ error: 'Failed to delete message' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to delete message' }, { status: 500, headers: noCacheHeaders })
   }
 }

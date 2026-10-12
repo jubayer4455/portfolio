@@ -433,6 +433,54 @@ export function writeAnonymousMessages(messages: AnonymousMessageData[]): boolea
   }
 }
 
+export async function getAnonymousMessages(): Promise<AnonymousMessageData[]> {
+  const supabase = getServiceSupabase()
+  if (supabase) {
+    try {
+      const { data, error } = await supabase
+        .from('site_settings')
+        .select('value')
+        .eq('key', 'anonymous_messages_json')
+        .maybeSingle()
+      if (!error && data && data.value) {
+        const parsed = JSON.parse(data.value)
+        if (Array.isArray(parsed)) {
+          return parsed
+        }
+      }
+    } catch (err) {
+      console.warn('Error reading anonymous_messages_json from Supabase:', err)
+    }
+  }
+  return readAnonymousMessages()
+}
+
+export async function saveAnonymousMessages(
+  messages: AnonymousMessageData[]
+): Promise<AnonymousMessageData[]> {
+  writeAnonymousMessages(messages)
+
+  const supabase = getServiceSupabase()
+  if (supabase) {
+    try {
+      await supabase.from('site_settings').upsert({
+        key: 'anonymous_messages_json',
+        value: JSON.stringify(messages),
+        updated_at: new Date().toISOString(),
+      })
+    } catch (err) {
+      console.warn('Failed to sync anonymous messages to Supabase:', err)
+    }
+  }
+
+  try {
+    revalidatePath('/admin')
+    revalidatePath('/admin/messages')
+  } catch {}
+
+  return messages
+}
+
 export async function addAnonymousMessage(message: string, emoji: string = '💭'): Promise<AnonymousMessageData> {
   const newMsg: AnonymousMessageData = {
     id: `msg-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
@@ -442,23 +490,9 @@ export async function addAnonymousMessage(message: string, emoji: string = '💭
     is_read: false,
   }
 
-  const list = readAnonymousMessages()
+  const list = await getAnonymousMessages()
   list.unshift(newMsg)
-  writeAnonymousMessages(list)
-
-  const supabase = getServiceSupabase()
-  if (supabase) {
-    try {
-      await supabase.from('anonymous_messages').insert([
-        {
-          message: newMsg.message,
-          emoji: newMsg.emoji,
-          created_at: newMsg.created_at,
-          is_read: false,
-        },
-      ])
-    } catch {}
-  }
+  await saveAnonymousMessages(list)
 
   return newMsg
 }

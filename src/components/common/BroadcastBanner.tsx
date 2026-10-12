@@ -25,7 +25,7 @@ export default function BroadcastBanner() {
       if (isDismissed) return
     } catch {}
 
-    fetch('/api/admin/broadcast')
+    fetch(`/api/admin/broadcast?_t=${Date.now()}`, { cache: 'no-store' })
       .then((res) => res.json())
       .then((json) => {
         if (json.success && json.data && json.data.enabled) {

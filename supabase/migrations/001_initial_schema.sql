@@ -122,12 +122,12 @@ CREATE INDEX IF NOT EXISTS idx_social_profiles_visible ON social_profiles(is_vis
 
 -- Default site settings
 INSERT INTO site_settings (key, value) VALUES
-  ('site_name', 'Alex Morgan Portfolio'),
-  ('tagline', 'Creative Developer & Digital Artist'),
-  ('bio', 'Hi, I''m Alex Morgan — a passionate creative developer and digital artist crafting immersive digital experiences. I blend code and creativity to build things that are both functional and beautiful.'),
-  ('contact_email', 'hello@alexmorgan.dev'),
-  ('seo_title', 'Alex Morgan — Creative Developer & Digital Artist'),
-  ('seo_description', 'Personal portfolio of Alex Morgan — creative developer, digital artist, and experience designer. Explore projects, gallery, and connect.')
+  ('site_name', 'Abdul Al Jubayer Portfolio'),
+  ('tagline', 'Visual Creator & Lifestyle Storyteller'),
+  ('bio', 'Hi, I''m Abdul Al Jubayer — a visual creator and lifestyle storyteller crafting authentic personal journeys.'),
+  ('contact_email', 'hello@jubayer.me'),
+  ('seo_title', 'Abdul Al Jubayer — Visual Creator & Lifestyle Storyteller'),
+  ('seo_description', 'Personal portfolio of Abdul Al Jubayer — visual creator, digital artist, and storyteller. Explore visual diary, projects, and connect.')
 ON CONFLICT (key) DO NOTHING;
 
 -- Default gallery categories
@@ -150,5 +150,5 @@ INSERT INTO social_profiles (platform, display_label, profile_url, icon_name, so
   ('Facebook', 'Facebook', 'https://facebook.com', 'Facebook', 7),
   ('Telegram', 'Telegram', 'https://t.me', 'Send', 8),
   ('WhatsApp', 'WhatsApp', 'https://wa.me', 'MessageCircle', 9),
-  ('Email', 'Email', 'mailto:hello@alexmorgan.dev', 'Mail', 10)
+  ('Email', 'Email', 'mailto:hello@jubayer.me', 'Mail', 10)
 ON CONFLICT DO NOTHING;

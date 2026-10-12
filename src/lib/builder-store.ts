@@ -382,22 +382,55 @@ export function writeAllReviews(reviews: SiteReviewData[]): boolean {
   }
 }
 
-export async function getApprovedReviews(): Promise<SiteReviewData[]> {
+export async function getAllReviews(): Promise<SiteReviewData[]> {
   const supabase = getServiceSupabase()
   if (supabase) {
     try {
       const { data, error } = await supabase
-        .from('site_reviews')
-        .select('*')
-        .eq('is_approved', true)
-        .order('created_at', { ascending: false })
-      if (!error && data && data.length > 0) {
-        return data as SiteReviewData[]
+        .from('site_settings')
+        .select('value')
+        .eq('key', 'site_reviews_json')
+        .maybeSingle()
+      if (!error && data && data.value) {
+        const parsed = JSON.parse(data.value)
+        if (Array.isArray(parsed)) {
+          return parsed
+        }
       }
-    } catch {}
+    } catch (err) {
+      console.warn('Error reading site_reviews_json from Supabase:', err)
+    }
+  }
+  return readAllReviews()
+}
+
+export async function saveAllReviews(reviews: SiteReviewData[]): Promise<SiteReviewData[]> {
+  writeAllReviews(reviews)
+
+  const supabase = getServiceSupabase()
+  if (supabase) {
+    try {
+      await supabase.from('site_settings').upsert({
+        key: 'site_reviews_json',
+        value: JSON.stringify(reviews),
+        updated_at: new Date().toISOString(),
+      })
+    } catch (err) {
+      console.warn('Failed to sync site reviews to Supabase:', err)
+    }
   }
 
-  const all = readAllReviews()
+  try {
+    revalidatePath('/')
+    revalidatePath('/admin')
+    revalidatePath('/admin/reviews')
+  } catch {}
+
+  return reviews
+}
+
+export async function getApprovedReviews(): Promise<SiteReviewData[]> {
+  const all = await getAllReviews()
   return all.filter((r) => r.is_approved).sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
 }
 
@@ -409,62 +442,35 @@ export async function addReview(review: Omit<SiteReviewData, 'id' | 'is_approved
     created_at: new Date().toISOString(),
   }
 
-  const all = readAllReviews()
+  const all = await getAllReviews()
   all.unshift(newReview)
-  writeAllReviews(all)
+  await saveAllReviews(all)
 
-  const supabase = getServiceSupabase()
-  if (supabase) {
-    try {
-      await supabase.from('site_reviews').insert([
-        {
-          user_id: newReview.user_id,
-          user_name: newReview.user_name,
-          user_photo: newReview.user_photo,
-          social_link: newReview.social_link,
-          rating: newReview.rating,
-          comment: newReview.comment,
-          is_approved: false,
-          created_at: newReview.created_at,
-        },
-      ])
-    } catch {}
-  }
+  recordActivity(
+    'review_submitted',
+    'New Review Submitted',
+    `${newReview.user_name} left a ${newReview.rating}-star review: "${newReview.comment.slice(0, 30)}..."`,
+    'review',
+    newReview.user_name
+  )
 
   return newReview
 }
 
 export async function setReviewApproval(reviewId: string, isApproved: boolean): Promise<boolean> {
-  const all = readAllReviews()
+  const all = await getAllReviews()
   const item = all.find((r) => r.id === reviewId)
   if (item) {
     item.is_approved = isApproved
-    writeAllReviews(all)
-  }
-
-  const supabase = getServiceSupabase()
-  if (supabase) {
-    try {
-      await supabase
-        .from('site_reviews')
-        .update({ is_approved: isApproved })
-        .eq('id', reviewId)
-    } catch {}
+    await saveAllReviews(all)
   }
   return true
 }
 
 export async function deleteReview(reviewId: string): Promise<boolean> {
-  const all = readAllReviews()
+  const all = await getAllReviews()
   const filtered = all.filter((r) => r.id !== reviewId)
-  writeAllReviews(filtered)
-
-  const supabase = getServiceSupabase()
-  if (supabase) {
-    try {
-      await supabase.from('site_reviews').delete().eq('id', reviewId)
-    } catch {}
-  }
+  await saveAllReviews(filtered)
   return true
 }
 

@@ -20,8 +20,8 @@ import {
   ArrowUpRight,
 } from 'lucide-react'
 import Link from 'next/link'
-import { readContentFile, readAnonymousMessages, getSiteSettings, getSocialProfiles, getGalleryItems } from '@/lib/content-store'
-import { getAllUserBios, readAllReviews } from '@/lib/builder-store'
+import { readContentFile, getAnonymousMessages, getSiteSettings, getSocialProfiles, getGalleryItems } from '@/lib/content-store'
+import { getAllUserBios, getAllReviews } from '@/lib/builder-store'
 import { getFeaturedProjects } from '@/lib/projects-store'
 import fs from 'fs'
 import path from 'path'
@@ -67,14 +67,15 @@ function StatCard({ label, value, sub, icon, color }: StatCardProps) {
 }
 
 export default async function AdminDashboard() {
-  const [content, settings, socials, gallery, projects, allUserBios, allReviews] = await Promise.all([
+  const [content, settings, socials, gallery, projects, allUserBios, allReviews, secretMessages] = await Promise.all([
     readContentFile(),
     getSiteSettings(),
     getSocialProfiles(),
     getGalleryItems(),
     getFeaturedProjects(),
     getAllUserBios(),
-    readAllReviews(),
+    getAllReviews(),
+    getAnonymousMessages(),
   ])
 
   const imageCount = gallery.length
@@ -91,7 +92,6 @@ export default async function AdminDashboard() {
   const totalClicks = socialList.reduce((acc, s) => acc + (s.click_count || 0), 0)
 
   // Anonymous secret messages
-  const secretMessages = readAnonymousMessages()
   const unreadSecretCount = secretMessages.filter((m) => !m.is_read).length
 
   // Direct contact submissions
@@ -112,17 +112,20 @@ export default async function AdminDashboard() {
     }
   } catch {}
 
-  const submissionCount = localSubmissions.length
+  let submissionCount = localSubmissions.length
   let recentSubmissions = localSubmissions.slice(0, 5)
 
   try {
     const serviceSupabase = getServiceSupabase()
-    const { data: subData } = await serviceSupabase
+    const { data: subData, count } = await serviceSupabase
       .from('contact_submissions')
-      .select('*')
+      .select('*', { count: 'exact' })
       .order('created_at', { ascending: false })
       .limit(5)
-    if (subData && subData.length > 0) recentSubmissions = subData
+    if (subData && subData.length > 0) {
+      recentSubmissions = subData
+      submissionCount = count ?? subData.length
+    }
   } catch {}
 
   // Sort socials by click count

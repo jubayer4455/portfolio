@@ -299,7 +299,7 @@ export default function AdminSocialPage() {
               </label>
               <input
                 type="text"
-                placeholder="e.g. @alexmorgan"
+                placeholder="e.g. @helllo.jubayer"
                 value={addForm.handle}
                 onChange={(e) => setAddForm((p) => ({ ...p, handle: e.target.value }))}
                 className={inputClass}

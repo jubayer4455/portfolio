@@ -2,14 +2,21 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getApprovedReviews, addReview } from '@/lib/builder-store'
 
 export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
+const noCacheHeaders = {
+  'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+  Pragma: 'no-cache',
+  Expires: '0',
+}
 
 export async function GET() {
   try {
     const reviews = await getApprovedReviews()
-    return NextResponse.json({ success: true, data: reviews })
+    return NextResponse.json({ success: true, data: reviews }, { headers: noCacheHeaders })
   } catch (err: any) {
     console.error('Error fetching reviews:', err)
-    return NextResponse.json({ error: 'Failed to load reviews' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to load reviews' }, { status: 500, headers: noCacheHeaders })
   }
 }
 

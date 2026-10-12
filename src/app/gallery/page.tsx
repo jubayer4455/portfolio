@@ -158,7 +158,7 @@ async function getGalleryImages(): Promise<GalleryImage[]> {
 
 export default async function GalleryPage() {
   const images = await getGalleryImages()
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://alexmorgan.dev'
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://jubayer.me'
 
   return (
     <>

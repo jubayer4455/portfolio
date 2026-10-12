@@ -19,7 +19,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function PrivacyPage() {
   const settings = await getSiteSettings()
   const fullName = `${settings.first_name} ${settings.last_name}`.trim()
-  const contactEmail = settings.contact_email || 'hello@alexmorgan.dev'
+  const contactEmail = settings.contact_email || 'hello@jubayer.me'
 
   return (
     <>
