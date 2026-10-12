@@ -17,9 +17,11 @@ import type { FeaturedProject } from '@/lib/projects-store'
 
 interface Props {
   projects: FeaturedProject[]
+  title?: string
+  subtitle?: string
 }
 
-export default function WebProjectsShowcase({ projects }: Props) {
+export default function WebProjectsShowcase({ projects, title, subtitle }: Props) {
   const [selectedCategory, setSelectedCategory] = useState('All')
   const [clickedMap, setClickedMap] = useState<Record<string, number>>({})
 
@@ -59,11 +61,17 @@ export default function WebProjectsShowcase({ projects }: Props) {
         <div className="text-center max-w-3xl mx-auto mb-12 md:mb-16">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-orange-500/10 border border-orange-500/25 text-orange-400 text-xs font-semibold uppercase tracking-wider mb-4 shadow-lg shadow-orange-500/10">
             <Globe size={13} />
-            <span>Live Web Portfolio</span>
+            <span>{subtitle || 'Live Web Portfolio'}</span>
           </div>
 
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold font-display text-white tracking-tight">
-            Featured <span className="text-gradient">Web Projects</span>
+            {title ? (
+              title
+            ) : (
+              <>
+                Featured <span className="text-gradient">Web Projects</span>
+              </>
+            )}
           </h2>
 
           <p className="text-white/60 text-sm md:text-base mt-4 leading-relaxed">

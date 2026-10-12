@@ -20,14 +20,16 @@ import {
   ArrowUpRight,
 } from 'lucide-react'
 import Link from 'next/link'
-import { readContentFile, readAnonymousMessages } from '@/lib/content-store'
+import { readContentFile, readAnonymousMessages, getSiteSettings, getSocialProfiles, getGalleryItems } from '@/lib/content-store'
 import { getAllUserBios, readAllReviews } from '@/lib/builder-store'
+import { getFeaturedProjects } from '@/lib/projects-store'
 import fs from 'fs'
 import path from 'path'
 import PlatformIcon from '@/components/common/PlatformIcon'
 import AnalyticsIntelligence from '@/components/admin/AnalyticsIntelligence'
 import BroadcastManager from '@/components/admin/BroadcastManager'
 import DataBackupExport from '@/components/admin/DataBackupExport'
+import MasterControlBar from '@/components/admin/MasterControlBar'
 
 export const dynamic = 'force-dynamic'
 
@@ -64,12 +66,19 @@ function StatCard({ label, value, sub, icon, color }: StatCardProps) {
 }
 
 export default async function AdminDashboard() {
-  const content = readContentFile()
-  const allUserBios = await getAllUserBios()
-  const allReviews = readAllReviews()
-  const imageCount = content.gallery?.length || 0
-  const socialList = content.socials || []
-  const totalViews = content.settings?.total_views || 142
+  const [content, settings, socials, gallery, projects, allUserBios, allReviews] = await Promise.all([
+    readContentFile(),
+    getSiteSettings(),
+    getSocialProfiles(),
+    getGalleryItems(),
+    getFeaturedProjects(),
+    getAllUserBios(),
+    readAllReviews(),
+  ])
+
+  const imageCount = gallery.length
+  const socialList = socials
+  const totalViews = settings.total_views || content.settings?.total_views || 142
 
   // Aggregate user bio traffic
   const bioViewsSum = allUserBios.reduce((acc, b) => acc + (b.views || 0), 0)
@@ -159,6 +168,16 @@ export default async function AdminDashboard() {
           </div>
         </div>
       </div>
+
+      {/* Super Admin Master Access Center & 1-Click Sync */}
+      <MasterControlBar
+        imageCount={imageCount}
+        socialCount={socialList.length}
+        projectsCount={projects.length}
+        messagesCount={secretMessages.length}
+        reviewsCount={allReviews.length}
+        settings={settings}
+      />
 
       {/* Primary KPI Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">

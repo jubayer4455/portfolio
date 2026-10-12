@@ -127,7 +127,7 @@ export default function SocialHub({ socials, settings }: SocialHubProps) {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, margin: '-80px' })
 
-  const displayList: DisplaySocial[] = (socials && socials.length > 0)
+  const displayList: DisplaySocial[] = Array.isArray(socials)
     ? socials
         .filter((s) => s.is_visible)
         .map((s) => ({
@@ -142,6 +142,9 @@ export default function SocialHub({ socials, settings }: SocialHubProps) {
 
   const spotlightEnabled = settings?.spotlight_enabled && settings?.spotlight_title && settings?.spotlight_url
   const spotlightUrl = settings?.spotlight_url ? ensureAbsoluteUrl(settings.spotlight_url) : '#'
+
+  const sectionTitle = settings?.socials_title
+  const sectionSubtitle = settings?.socials_subtitle
 
   return (
     <section id="social" className="section-padding bg-[#0a0a0a] relative overflow-hidden">
@@ -161,12 +164,18 @@ export default function SocialHub({ socials, settings }: SocialHubProps) {
           <div className="flex items-center justify-center gap-3 mb-3">
             <div className="w-1.5 h-6 rounded-full bg-orange-500" />
             <span className="text-orange-400 text-xs uppercase tracking-widest font-semibold">
-              Official Links
+              {sectionSubtitle || 'Official Links'}
             </span>
             <div className="w-1.5 h-6 rounded-full bg-orange-500" />
           </div>
           <h2 className="heading-lg text-white mb-3">
-            Connect <span className="text-gradient">With Me</span>
+            {sectionTitle ? (
+              sectionTitle
+            ) : (
+              <>
+                Connect <span className="text-gradient">With Me</span>
+              </>
+            )}
           </h2>
           <p className="text-white/50 max-w-md mx-auto text-sm">
             All my official social accounts in one place. Click any card to visit my profile directly.

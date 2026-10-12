@@ -382,15 +382,17 @@ function Lightbox({
 // ── Main section ─────────────────────────────────────────────────────────────
 interface GallerySectionProps {
   items?: GalleryImageData[]
+  title?: string
+  subtitle?: string
 }
 
-export default function GallerySection({ items }: GallerySectionProps) {
+export default function GallerySection({ items, title, subtitle }: GallerySectionProps) {
   const [activeCategory, setActiveCategory] = useState('All')
   const [lightboxItem, setLightboxItem] = useState<GalleryItem | null>(null)
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, margin: '-80px' })
 
-  const displayItems: GalleryItem[] = (items && items.length > 0)
+  const displayItems: GalleryItem[] = Array.isArray(items)
     ? items
         .filter((i) => i.is_public !== false)
         .map((i) => ({
@@ -442,12 +444,18 @@ export default function GallerySection({ items }: GallerySectionProps) {
           <div className="flex items-center justify-center gap-3 mb-3">
             <div className="w-1.5 h-6 rounded-full bg-orange-500" />
             <span className="text-orange-400 text-xs uppercase tracking-widest font-semibold">
-              Visual Diary
+              {subtitle || 'Visual Diary'}
             </span>
             <div className="w-1.5 h-6 rounded-full bg-orange-500" />
           </div>
           <h2 className="heading-lg text-white mb-3">
-            Captured <span className="text-gradient">Moments</span>
+            {title ? (
+              title
+            ) : (
+              <>
+                Captured <span className="text-gradient">Moments</span>
+              </>
+            )}
           </h2>
           <p className="text-white/50 max-w-md mx-auto text-sm">
             A personal visual journal of travels, portraits, everyday aesthetics, and memorable vibes.

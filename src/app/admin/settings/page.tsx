@@ -14,8 +14,18 @@ import {
   MapPin,
   CheckCircle2,
   Quote,
-  Globe,
+  Sliders,
+  Images,
+  FolderGit2,
+  Share2,
+  Users,
+  Star,
+  HelpCircle,
+  Eye,
+  EyeOff,
+  Send,
   Music,
+  Globe,
 } from 'lucide-react'
 import type { SiteSettingsData } from '@/lib/content-store'
 
@@ -34,11 +44,33 @@ const defaultSettings: SiteSettingsData = {
   spotlight_enabled: true,
   whatsapp_number: '+8801700000000',
   status_badge: 'Open to chats & new connections ✨',
+  music_enabled: true,
+  music_title: 'Lofi Sunset Chill 🎧',
+  music_url: 'https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3',
   contact_email: 'hello@jubayer.me',
   bio_full_p1: "Hey there! I'm Abdul Al Jubayer, a passionate visual creator and lifestyle storyteller based in Dhaka, Bangladesh.",
   bio_full_p2: 'I believe every day holds a story waiting to be told. Whether I explore new places, capture aesthetic moments, or meet fascinating people, this space is where I share my personal journey.',
   seo_title: 'Abdul Al Jubayer — Official Bio & Social Hub',
   seo_description: 'Official link-in-bio and personal social hub of Abdul Al Jubayer. Connect on Instagram, Facebook, YouTube, TikTok, and explore photos.',
+
+  // Master Section Visibility Toggles
+  gallery_enabled: true,
+  projects_enabled: true,
+  socials_enabled: true,
+  about_enabled: true,
+  reviews_enabled: true,
+  creators_enabled: true,
+  anonymous_box_enabled: true,
+  faq_enabled: true,
+  contact_enabled: true,
+
+  // Master Section Custom Titles
+  gallery_title: 'Captured Moments',
+  gallery_subtitle: 'Visual Diary',
+  projects_title: 'Featured Web Projects',
+  projects_subtitle: 'Live Web Portfolio',
+  socials_title: 'Connect With Me',
+  socials_subtitle: 'Official Links',
 }
 
 export default function AdminSettingsPage() {
@@ -151,6 +183,258 @@ export default function AdminSettingsPage() {
       </div>
 
       <form onSubmit={handleSave} className="space-y-6">
+        {/* 0. MASTER SECTION CONTROLS (SHOW/HIDE EVERYTHING & CUSTOM TITLES) */}
+        <div className="glass gradient-border rounded-2xl p-6 space-y-6 border-orange-500/30 bg-orange-500/[0.02]">
+          <div className="flex items-center justify-between border-b border-white/[0.08] pb-4">
+            <div>
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-orange-500/20 text-orange-400 text-[11px] font-semibold mb-1">
+                <Sliders size={12} />
+                <span>MASTER PLATFORM SWITCHES</span>
+              </div>
+              <h2 className="text-white font-bold text-lg">Live Site Section Controls</h2>
+              <p className="text-white/40 text-xs mt-0.5">
+                Turn any section On/Off with 1 click or customize section headers and subtitles on the live website.
+              </p>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            {/* Gallery / Visual Diary */}
+            <div className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.06] space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-lg bg-orange-500/20 text-orange-400 flex items-center justify-center">
+                    <Images size={16} />
+                  </div>
+                  <div>
+                    <h3 className="text-white text-sm font-semibold">Visual Diary / Captured Moments Gallery</h3>
+                    <p className="text-white/40 text-xs">Photo grid showcasing personal photography and travels</p>
+                  </div>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={settings.gallery_enabled !== false}
+                    onChange={(e) => handleChange('gallery_enabled', e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-500"></div>
+                </label>
+              </div>
+
+              {settings.gallery_enabled !== false && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-white/[0.04]">
+                  <div>
+                    <label className="block text-white/50 text-[11px] font-medium mb-1">Main Heading</label>
+                    <input
+                      type="text"
+                      placeholder="Captured Moments"
+                      value={settings.gallery_title || ''}
+                      onChange={(e) => handleChange('gallery_title', e.target.value)}
+                      className="w-full px-3 py-1.5 rounded-lg glass text-xs text-white placeholder-white/30"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-white/50 text-[11px] font-medium mb-1">Badge Subtitle</label>
+                    <input
+                      type="text"
+                      placeholder="Visual Diary"
+                      value={settings.gallery_subtitle || ''}
+                      onChange={(e) => handleChange('gallery_subtitle', e.target.value)}
+                      className="w-full px-3 py-1.5 rounded-lg glass text-xs text-white placeholder-white/30"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Web Projects Showcase */}
+            <div className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.06] space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center">
+                    <FolderGit2 size={16} />
+                  </div>
+                  <div>
+                    <h3 className="text-white text-sm font-semibold">Web Projects Showcase</h3>
+                    <p className="text-white/40 text-xs">Live websites and projects with high-res logos</p>
+                  </div>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={settings.projects_enabled !== false}
+                    onChange={(e) => handleChange('projects_enabled', e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-500"></div>
+                </label>
+              </div>
+
+              {settings.projects_enabled !== false && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-white/[0.04]">
+                  <div>
+                    <label className="block text-white/50 text-[11px] font-medium mb-1">Main Heading</label>
+                    <input
+                      type="text"
+                      placeholder="Featured Web Projects"
+                      value={settings.projects_title || ''}
+                      onChange={(e) => handleChange('projects_title', e.target.value)}
+                      className="w-full px-3 py-1.5 rounded-lg glass text-xs text-white placeholder-white/30"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-white/50 text-[11px] font-medium mb-1">Badge Subtitle</label>
+                    <input
+                      type="text"
+                      placeholder="Live Web Portfolio"
+                      value={settings.projects_subtitle || ''}
+                      onChange={(e) => handleChange('projects_subtitle', e.target.value)}
+                      className="w-full px-3 py-1.5 rounded-lg glass text-xs text-white placeholder-white/30"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Social Links Hub */}
+            <div className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.06] space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-lg bg-pink-500/20 text-pink-400 flex items-center justify-center">
+                    <Share2 size={16} />
+                  </div>
+                  <div>
+                    <h3 className="text-white text-sm font-semibold">Social Links Hub</h3>
+                    <p className="text-white/40 text-xs">Connected social platform cards and 1-click links</p>
+                  </div>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={settings.socials_enabled !== false}
+                    onChange={(e) => handleChange('socials_enabled', e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-500"></div>
+                </label>
+              </div>
+
+              {settings.socials_enabled !== false && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-white/[0.04]">
+                  <div>
+                    <label className="block text-white/50 text-[11px] font-medium mb-1">Main Heading</label>
+                    <input
+                      type="text"
+                      placeholder="Connect With Me"
+                      value={settings.socials_title || ''}
+                      onChange={(e) => handleChange('socials_title', e.target.value)}
+                      className="w-full px-3 py-1.5 rounded-lg glass text-xs text-white placeholder-white/30"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-white/50 text-[11px] font-medium mb-1">Badge Subtitle</label>
+                    <input
+                      type="text"
+                      placeholder="Official Links"
+                      value={settings.socials_subtitle || ''}
+                      onChange={(e) => handleChange('socials_subtitle', e.target.value)}
+                      className="w-full px-3 py-1.5 rounded-lg glass text-xs text-white placeholder-white/30"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Other Section Quick Switches Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+              {/* Bio & About Section */}
+              <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.06] flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <User size={15} className="text-orange-400" />
+                  <span className="text-white text-xs font-medium">About &amp; Story Section</span>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={settings.about_enabled !== false}
+                  onChange={(e) => handleChange('about_enabled', e.target.checked)}
+                  className="w-4 h-4 rounded text-orange-500 bg-white/10 border-white/20 focus:ring-orange-500"
+                />
+              </div>
+
+              {/* Reviews Moderation */}
+              <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.06] flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Star size={15} className="text-amber-400" />
+                  <span className="text-white text-xs font-medium">Public Reviews &amp; Testimonials</span>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={settings.reviews_enabled !== false}
+                  onChange={(e) => handleChange('reviews_enabled', e.target.checked)}
+                  className="w-4 h-4 rounded text-orange-500 bg-white/10 border-white/20 focus:ring-orange-500"
+                />
+              </div>
+
+              {/* Featured Creators Section */}
+              <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.06] flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Users size={15} className="text-purple-400" />
+                  <span className="text-white text-xs font-medium">Featured Creators &amp; Bio Builder</span>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={settings.creators_enabled !== false}
+                  onChange={(e) => handleChange('creators_enabled', e.target.checked)}
+                  className="w-4 h-4 rounded text-orange-500 bg-white/10 border-white/20 focus:ring-orange-500"
+                />
+              </div>
+
+              {/* Anonymous Message Box */}
+              <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.06] flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <MessageCircle size={15} className="text-pink-400" />
+                  <span className="text-white text-xs font-medium">Anonymous Secret Message Box</span>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={settings.anonymous_box_enabled !== false}
+                  onChange={(e) => handleChange('anonymous_box_enabled', e.target.checked)}
+                  className="w-4 h-4 rounded text-orange-500 bg-white/10 border-white/20 focus:ring-orange-500"
+                />
+              </div>
+
+              {/* FAQ Section */}
+              <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.06] flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <HelpCircle size={15} className="text-emerald-400" />
+                  <span className="text-white text-xs font-medium">FAQ Accordion Section</span>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={settings.faq_enabled !== false}
+                  onChange={(e) => handleChange('faq_enabled', e.target.checked)}
+                  className="w-4 h-4 rounded text-orange-500 bg-white/10 border-white/20 focus:ring-orange-500"
+                />
+              </div>
+
+              {/* Contact Section */}
+              <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.06] flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Send size={15} className="text-cyan-400" />
+                  <span className="text-white text-xs font-medium">Direct Contact Form</span>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={settings.contact_enabled !== false}
+                  onChange={(e) => handleChange('contact_enabled', e.target.checked)}
+                  className="w-4 h-4 rounded text-orange-500 bg-white/10 border-white/20 focus:ring-orange-500"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* 1. Identity & Avatar */}
         <div className="glass gradient-border rounded-2xl p-6 space-y-4">
           <h2 className="text-white font-semibold text-base flex items-center gap-2">

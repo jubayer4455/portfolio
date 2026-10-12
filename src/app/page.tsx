@@ -41,16 +41,55 @@ export default async function HomePage() {
       <Navigation settings={settings} />
       <main id="main-content">
         <HeroSection settings={settings} socials={socials} />
-        <WebProjectsShowcase projects={projects} />
-        <SocialHub socials={socials} settings={settings} />
-        <GallerySection items={gallery} />
-        <BuilderFeatureBanner />
-        <FeaturedCreatorsSection featuredUsers={featuredUsers} />
-        <AboutSection settings={settings} />
-        <ReviewsSection initialReviews={reviews} />
-        <FaqSection />
-        <AnonymousMessageBox />
-        <ContactSection settings={settings} socials={socials} />
+
+        {settings.projects_enabled !== false && projects.length > 0 && (
+          <WebProjectsShowcase
+            projects={projects}
+            title={settings.projects_title}
+            subtitle={settings.projects_subtitle}
+          />
+        )}
+
+        {settings.socials_enabled !== false && socials.length > 0 && (
+          <SocialHub socials={socials} settings={settings} />
+        )}
+
+        {settings.gallery_enabled !== false && gallery.length > 0 && (
+          <GallerySection
+            items={gallery}
+            title={settings.gallery_title}
+            subtitle={settings.gallery_subtitle}
+          />
+        )}
+
+        {settings.creators_enabled !== false && (
+          <>
+            <BuilderFeatureBanner />
+            {featuredUsers.length > 0 && (
+              <FeaturedCreatorsSection featuredUsers={featuredUsers} />
+            )}
+          </>
+        )}
+
+        {settings.about_enabled !== false && (
+          <AboutSection settings={settings} />
+        )}
+
+        {settings.reviews_enabled !== false && (
+          <ReviewsSection initialReviews={reviews} />
+        )}
+
+        {settings.faq_enabled !== false && (
+          <FaqSection />
+        )}
+
+        {settings.anonymous_box_enabled !== false && (
+          <AnonymousMessageBox />
+        )}
+
+        {settings.contact_enabled !== false && (
+          <ContactSection settings={settings} socials={socials} />
+        )}
       </main>
       <MusicPlayer
         enabled={settings.music_enabled !== false}

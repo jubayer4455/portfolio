@@ -119,3 +119,24 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Failed to create gallery item' }, { status: 500 })
   }
 }
+
+// DELETE — bulk clear all gallery images
+export async function DELETE() {
+  try {
+    await saveGalleryItems([])
+
+    const supabase = getServiceSupabase()
+    if (supabase) {
+      try {
+        await supabase.from('gallery_images').delete().neq('title', '')
+      } catch (e) {
+        console.warn('Supabase gallery bulk delete error:', e)
+      }
+    }
+
+    return NextResponse.json({ success: true, message: 'All gallery images have been cleared.' })
+  } catch (err) {
+    console.error('[gallery DELETE ALL] error:', err)
+    return NextResponse.json({ error: 'Failed to clear gallery images' }, { status: 500 })
+  }
+}

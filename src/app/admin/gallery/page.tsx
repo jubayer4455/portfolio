@@ -191,11 +191,39 @@ export default function AdminGalleryPage() {
       const res = await fetch(`/api/gallery/${id}`, { method: 'DELETE' })
       if (res.ok) {
         setImages((prev) => prev.filter((img) => img.id !== id))
+        setUploadStatus('success')
+        setUploadMessage('Photo deleted and removed from the live website!')
+        setTimeout(() => setUploadStatus('idle'), 4000)
       }
     } catch (err) {
       console.error('Failed to delete image:', err)
     } finally {
       setDeletingId(null)
+    }
+  }
+
+  const handleClearAll = async () => {
+    if (
+      !confirm(
+        'Are you sure you want to remove ALL photos from the gallery? This will immediately clear the Visual Diary on the live site.'
+      )
+    )
+      return
+
+    setUploading(true)
+    try {
+      const res = await fetch('/api/gallery', { method: 'DELETE' })
+      if (res.ok) {
+        setImages([])
+        setUploadStatus('success')
+        setUploadMessage('All photos removed! The Visual Diary on your live site is now completely empty.')
+        setTimeout(() => setUploadStatus('idle'), 4000)
+      }
+    } catch {
+      setUploadStatus('error')
+      setUploadMessage('Failed to clear photos.')
+    } finally {
+      setUploading(false)
     }
   }
 
@@ -213,11 +241,24 @@ export default function AdminGalleryPage() {
 
   return (
     <div className="space-y-8 max-w-5xl">
-      <div>
-        <h1 className="text-white text-2xl font-bold font-display">Gallery Manager</h1>
-        <p className="text-white/40 mt-1">
-          Upload and manage public portfolio photos and artworks.
-        </p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-white text-2xl font-bold font-display">Gallery Manager</h1>
+          <p className="text-white/40 mt-1">
+            Upload and manage public portfolio photos and artworks. Everything syncs to the live site.
+          </p>
+        </div>
+        {images.length > 0 && (
+          <button
+            type="button"
+            onClick={handleClearAll}
+            disabled={uploading}
+            className="px-3.5 py-2 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 hover:bg-red-500/20 text-xs font-medium inline-flex items-center gap-1.5 transition-colors self-start sm:self-auto"
+          >
+            <Trash2 size={13} />
+            <span>Clear All Photos ({images.length})</span>
+          </button>
+        )}
       </div>
 
       {/* Upload Form */}

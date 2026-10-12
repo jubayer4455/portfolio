@@ -28,6 +28,27 @@ export interface SiteSettingsData {
   bio_full_p2?: string
   seo_title: string
   seo_description: string
+
+  // Master Section Visibility Toggles
+  gallery_enabled?: boolean
+  projects_enabled?: boolean
+  socials_enabled?: boolean
+  about_enabled?: boolean
+  reviews_enabled?: boolean
+  creators_enabled?: boolean
+  anonymous_box_enabled?: boolean
+  faq_enabled?: boolean
+  contact_enabled?: boolean
+
+  // Master Section Custom Titles
+  gallery_title?: string
+  gallery_subtitle?: string
+  projects_title?: string
+  projects_subtitle?: string
+  socials_title?: string
+  socials_subtitle?: string
+  about_title?: string
+  reviews_title?: string
 }
 
 export interface SocialProfileData {
@@ -175,20 +196,20 @@ export async function getSiteSettings(): Promise<SiteSettingsData> {
       const { data } = await supabase.from('site_settings').select('*')
       if (data && data.length > 0) {
         const fileContent = readContentFile()
-        const merged = { ...fileContent.settings }
+        const merged: Record<string, unknown> = { ...fileContent.settings }
         data.forEach((row: { key: string; value: string }) => {
-          if (row.key in merged) {
-            ;(merged as unknown as Record<string, unknown>)[row.key] =
+          if (!row.key.endsWith('_json')) {
+            merged[row.key] =
               row.value === 'true'
                 ? true
                 : row.value === 'false'
                 ? false
-                : isNaN(Number(row.value)) || row.key === 'whatsapp_number'
+                : isNaN(Number(row.value)) || row.key === 'whatsapp_number' || typeof row.value !== 'string'
                 ? row.value
                 : Number(row.value)
           }
         })
-        return merged
+        return merged as unknown as SiteSettingsData
       }
     } catch {
       // fallback to file
@@ -207,16 +228,24 @@ export async function updateSiteSettings(
   const supabase = getServiceSupabase()
   if (supabase) {
     try {
-      const rows = Object.entries(updates).map(([key, value]) => ({
-        key,
-        value: String(value),
-        updated_at: new Date().toISOString(),
-      }))
+      const rows = Object.entries(updates)
+        .filter(([key]) => !key.endsWith('_json'))
+        .map(([key, value]) => ({
+          key,
+          value: String(value),
+          updated_at: new Date().toISOString(),
+        }))
       await supabase.from('site_settings').upsert(rows)
     } catch (err) {
       console.warn('Supabase settings sync failed (using local store):', err)
     }
   }
+
+  try {
+    revalidatePath('/')
+    revalidatePath('/admin')
+    revalidatePath('/admin/settings')
+  } catch {}
 
   return content.settings
 }
@@ -241,8 +270,26 @@ export async function incrementPageViews(): Promise<number> {
 
 // ── SOCIALS & CLICK TRACKING ───────────────────────────────────
 export async function getSocialProfiles(): Promise<SocialProfileData[]> {
+  const supabase = getServiceSupabase()
+  if (supabase) {
+    try {
+      const { data, error } = await supabase
+        .from('site_settings')
+        .select('value')
+        .eq('key', 'social_profiles_json')
+        .maybeSingle()
+      if (!error && data && data.value !== null && data.value !== undefined) {
+        const parsed = JSON.parse(data.value)
+        if (Array.isArray(parsed)) {
+          return parsed.sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
+        }
+      }
+    } catch (err) {
+      console.warn('Error reading social_profiles_json from Supabase:', err)
+    }
+  }
   const content = readContentFile()
-  return content.socials.sort((a, b) => a.sort_order - b.sort_order)
+  return (content.socials || []).sort((a, b) => a.sort_order - b.sort_order)
 }
 
 export async function saveSocialProfiles(
@@ -251,27 +298,37 @@ export async function saveSocialProfiles(
   const content = readContentFile()
   content.socials = socials
   writeContentFile(content)
+
+  const supabase = getServiceSupabase()
+  if (supabase) {
+    try {
+      await supabase.from('site_settings').upsert({
+        key: 'social_profiles_json',
+        value: JSON.stringify(socials),
+        updated_at: new Date().toISOString(),
+      })
+    } catch (err) {
+      console.warn('Failed to sync social profiles to Supabase:', err)
+    }
+  }
+
+  try {
+    revalidatePath('/')
+    revalidatePath('/admin')
+    revalidatePath('/admin/social')
+  } catch {}
+
   return content.socials
 }
 
 export async function incrementSocialClick(profileIdOrPlatform: string): Promise<number> {
-  const content = readContentFile()
-  const item = content.socials.find(
+  const allSocials = await getSocialProfiles()
+  const item = allSocials.find(
     (s) => s.id === profileIdOrPlatform || s.platform.toLowerCase() === profileIdOrPlatform.toLowerCase()
   )
   if (item) {
     item.click_count = (item.click_count || 0) + 1
-    writeContentFile(content)
-
-    const supabase = getServiceSupabase()
-    if (supabase) {
-      try {
-        await supabase
-          .from('social_profiles')
-          .update({ click_count: item.click_count, updated_at: new Date().toISOString() })
-          .eq('profile_url', item.profile_url)
-      } catch {}
-    }
+    await saveSocialProfiles(allSocials)
     return item.click_count
   }
   return 0
@@ -279,8 +336,26 @@ export async function incrementSocialClick(profileIdOrPlatform: string): Promise
 
 // ── GALLERY & LIKES ────────────────────────────────────────────
 export async function getGalleryItems(): Promise<GalleryImageData[]> {
+  const supabase = getServiceSupabase()
+  if (supabase) {
+    try {
+      const { data, error } = await supabase
+        .from('site_settings')
+        .select('value')
+        .eq('key', 'gallery_images_json')
+        .maybeSingle()
+      if (!error && data && data.value !== null && data.value !== undefined) {
+        const parsed = JSON.parse(data.value)
+        if (Array.isArray(parsed)) {
+          return parsed.sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
+        }
+      }
+    } catch (err) {
+      console.warn('Error reading gallery_images_json from Supabase:', err)
+    }
+  }
   const content = readContentFile()
-  return content.gallery.sort((a, b) => a.sort_order - b.sort_order)
+  return (content.gallery || []).sort((a, b) => a.sort_order - b.sort_order)
 }
 
 export async function saveGalleryItems(
@@ -289,25 +364,36 @@ export async function saveGalleryItems(
   const content = readContentFile()
   content.gallery = gallery
   writeContentFile(content)
+
+  const supabase = getServiceSupabase()
+  if (supabase) {
+    try {
+      await supabase.from('site_settings').upsert({
+        key: 'gallery_images_json',
+        value: JSON.stringify(gallery),
+        updated_at: new Date().toISOString(),
+      })
+    } catch (err) {
+      console.warn('Failed to sync gallery to Supabase site_settings:', err)
+    }
+  }
+
+  try {
+    revalidatePath('/')
+    revalidatePath('/gallery')
+    revalidatePath('/admin')
+    revalidatePath('/admin/gallery')
+  } catch {}
+
   return content.gallery
 }
 
 export async function incrementPhotoLike(photoId: string): Promise<number> {
-  const content = readContentFile()
-  const item = content.gallery.find((g) => g.id === photoId || g.slug === photoId)
+  const allGallery = await getGalleryItems()
+  const item = allGallery.find((g) => g.id === photoId || g.slug === photoId)
   if (item) {
     item.likes_count = (item.likes_count || 0) + 1
-    writeContentFile(content)
-
-    const supabase = getServiceSupabase()
-    if (supabase) {
-      try {
-        await supabase
-          .from('gallery_images')
-          .update({ likes_count: item.likes_count, updated_at: new Date().toISOString() })
-          .eq('slug', item.slug)
-      } catch {}
-    }
+    await saveGalleryItems(allGallery)
     return item.likes_count
   }
   return 0
