@@ -3,6 +3,13 @@ import { getGalleryItems, saveGalleryItems, type GalleryImageData } from '@/lib/
 import { createClient as createServiceClient } from '@supabase/supabase-js'
 
 export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
+const NO_CACHE_HEADERS = {
+  'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+  Pragma: 'no-cache',
+  Expires: '0',
+}
 
 function getServiceSupabase() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -31,10 +38,10 @@ export async function GET(req: NextRequest) {
       )
     }
 
-    return NextResponse.json({ data: filtered })
+    return NextResponse.json({ data: filtered }, { headers: NO_CACHE_HEADERS })
   } catch (err) {
     console.error('[gallery GET] error:', err)
-    return NextResponse.json({ error: 'Failed to fetch gallery images' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to fetch gallery images' }, { status: 500, headers: NO_CACHE_HEADERS })
   }
 }
 
@@ -113,10 +120,10 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    return NextResponse.json({ data: newImage, success: true }, { status: 201 })
+    return NextResponse.json({ data: newImage, success: true }, { status: 201, headers: NO_CACHE_HEADERS })
   } catch (err) {
     console.error('[gallery POST] error:', err)
-    return NextResponse.json({ error: 'Failed to create gallery item' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to create gallery item' }, { status: 500, headers: NO_CACHE_HEADERS })
   }
 }
 
@@ -134,9 +141,9 @@ export async function DELETE() {
       }
     }
 
-    return NextResponse.json({ success: true, message: 'All gallery images have been cleared.' })
+    return NextResponse.json({ success: true, message: 'All gallery images have been cleared.' }, { headers: NO_CACHE_HEADERS })
   } catch (err) {
     console.error('[gallery DELETE ALL] error:', err)
-    return NextResponse.json({ error: 'Failed to clear gallery images' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to clear gallery images' }, { status: 500, headers: NO_CACHE_HEADERS })
   }
 }

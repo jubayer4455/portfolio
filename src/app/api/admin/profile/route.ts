@@ -3,6 +3,13 @@ import { getSiteSettings, updateSiteSettings } from '@/lib/content-store'
 import { createClient as createServiceClient } from '@supabase/supabase-js'
 
 export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
+const NO_CACHE_HEADERS = {
+  'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+  Pragma: 'no-cache',
+  Expires: '0',
+}
 
 function getServiceSupabase() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -18,10 +25,10 @@ function getServiceSupabase() {
 export async function GET() {
   try {
     const settings = await getSiteSettings()
-    return NextResponse.json({ data: settings })
+    return NextResponse.json({ data: settings }, { headers: NO_CACHE_HEADERS })
   } catch (err) {
     console.error('[admin/profile GET] error:', err)
-    return NextResponse.json({ error: 'Failed to load profile' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to load profile' }, { status: 500, headers: NO_CACHE_HEADERS })
   }
 }
 
@@ -100,17 +107,20 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    return NextResponse.json({
-      success: true,
-      data: updatedSettings,
-      authUpdated,
-      message: `Profile updated successfully!${authMessage}`,
-    })
+    return NextResponse.json(
+      {
+        success: true,
+        data: updatedSettings,
+        authUpdated,
+        message: `Profile updated successfully!${authMessage}`,
+      },
+      { headers: NO_CACHE_HEADERS }
+    )
   } catch (err: any) {
     console.error('[admin/profile POST] error:', err)
     return NextResponse.json(
       { error: err.message || 'Failed to update profile' },
-      { status: 500 }
+      { status: 500, headers: NO_CACHE_HEADERS }
     )
   }
 }

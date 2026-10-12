@@ -83,9 +83,9 @@ export default function Footer({ settings, socials }: FooterProps) {
                   target={item.profile_url.startsWith('mailto') ? undefined : '_blank'}
                   rel="noopener noreferrer"
                   aria-label={item.display_label || item.platform}
-                  className="w-9 h-9 rounded-lg glass flex items-center justify-center text-white/40 hover:text-orange-400 hover:border-orange-500/30 transition-all duration-300"
+                  className="w-9 h-9 rounded-lg glass border border-white/10 flex items-center justify-center hover:scale-110 hover:border-white/30 hover:bg-white/[0.08] transition-all duration-300"
                 >
-                  <PlatformIcon name={item.icon_name || item.platform} size={16} />
+                  <PlatformIcon platform={item.platform || item.display_label} name={item.icon_name || item.platform} size={17} />
                 </a>
               ))}
             </div>

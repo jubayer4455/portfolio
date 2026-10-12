@@ -9,6 +9,7 @@ import PlatformIcon from '@/components/common/PlatformIcon'
 interface DisplaySocial {
   id: string
   name: string
+  platform: string
   handle: string
   href: string
   icon_name?: string
@@ -16,14 +17,14 @@ interface DisplaySocial {
 }
 
 const defaultPlatforms: DisplaySocial[] = [
-  { id: '1', name: 'Instagram', handle: '@jubayer', href: 'https://instagram.com', icon_name: 'Instagram', color: '#E1306C' },
-  { id: '2', name: 'Facebook', handle: 'Abdul Al Jubayer', href: 'https://facebook.com', icon_name: 'Facebook', color: '#1877F2' },
-  { id: '3', name: 'YouTube', handle: 'Abdul Al Jubayer', href: 'https://youtube.com', icon_name: 'Youtube', color: '#FF0000' },
-  { id: '4', name: 'TikTok', handle: '@jubayer', href: 'https://tiktok.com', icon_name: 'Music', color: '#69C9D0' },
-  { id: '5', name: 'WhatsApp', handle: '+880 1700-000000', href: 'https://wa.me', icon_name: 'MessageCircle', color: '#25D366' },
-  { id: '6', name: 'Telegram', handle: '@jubayer', href: 'https://t.me', icon_name: 'Send', color: '#229ED9' },
-  { id: '7', name: 'X / Twitter', handle: '@jubayer', href: 'https://x.com', icon_name: 'Twitter', color: '#1DA1F2' },
-  { id: '8', name: 'Email', handle: 'hello@jubayer.me', href: 'mailto:hello@jubayer.me', icon_name: 'Mail', color: '#F97316' },
+  { id: '1', name: 'Instagram', platform: 'Instagram', handle: '@jubayer', href: 'https://instagram.com', icon_name: 'Instagram', color: '#E1306C' },
+  { id: '2', name: 'Facebook', platform: 'Facebook', handle: 'Abdul Al Jubayer', href: 'https://facebook.com', icon_name: 'Facebook', color: '#1877F2' },
+  { id: '3', name: 'YouTube', platform: 'YouTube', handle: 'Abdul Al Jubayer', href: 'https://youtube.com', icon_name: 'Youtube', color: '#FF0000' },
+  { id: '4', name: 'TikTok', platform: 'TikTok', handle: '@jubayer', href: 'https://tiktok.com', icon_name: 'TikTok', color: '#69C9D0' },
+  { id: '5', name: 'WhatsApp', platform: 'WhatsApp', handle: '+880 1700-000000', href: 'https://wa.me', icon_name: 'WhatsApp', color: '#25D366' },
+  { id: '6', name: 'Telegram', platform: 'Telegram', handle: '@jubayer', href: 'https://t.me', icon_name: 'Telegram', color: '#229ED9' },
+  { id: '7', name: 'X / Twitter', platform: 'X', handle: '@jubayer', href: 'https://x.com', icon_name: 'Twitter', color: '#1DA1F2' },
+  { id: '8', name: 'Email', platform: 'Email', handle: 'hello@jubayer.me', href: 'mailto:hello@jubayer.me', icon_name: 'Mail', color: '#F97316' },
 ]
 
 function ensureAbsoluteUrl(url: string) {
@@ -85,10 +86,9 @@ function SocialCard({
       {/* Top row: Icon & Arrow */}
       <div className="flex items-center justify-between">
         <div
-          className="relative w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110 shadow-md"
-          style={{ backgroundColor: `${color}18`, border: `1px solid ${color}35` }}
+          className="relative w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110 shadow-md bg-white/[0.04] border border-white/10"
         >
-          <PlatformIcon name={icon_name || name} size={22} style={{ color }} />
+          <PlatformIcon platform={platform.platform || platform.name} name={icon_name || name} size={26} />
         </div>
 
         <div
@@ -133,6 +133,7 @@ export default function SocialHub({ socials, settings }: SocialHubProps) {
         .map((s) => ({
           id: s.id,
           name: s.display_label || s.platform,
+          platform: s.platform || s.display_label || 'website',
           handle: s.handle || s.display_label,
           href: s.profile_url,
           icon_name: s.icon_name || s.platform,

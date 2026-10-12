@@ -90,7 +90,7 @@ export default function PlatformIcon({
   }
 
   // 4. TIKTOK (Official Musical Note with Neon Cyan & Magenta Chromatic Aberration)
-  if (normalized.includes('tik') || normalized.includes('tok')) {
+  if (normalized.includes('tik') || normalized.includes('tok') || normalized === 'music') {
     return (
       <svg
         width={dim}
@@ -120,7 +120,7 @@ export default function PlatformIcon({
   }
 
   // 5. WHATSAPP (Official Green Speech Bubble & Phone Receiver)
-  if (normalized.includes('whats') || normalized.includes('wa')) {
+  if (normalized.includes('whats') || normalized.includes('wa') || normalized.includes('message') || normalized.includes('chat')) {
     return (
       <svg
         width={dim}
@@ -140,7 +140,7 @@ export default function PlatformIcon({
   }
 
   // 6. TELEGRAM (Official Sky Blue Disc & Paper Airplane)
-  if (normalized.includes('tele') || normalized.includes('t.me')) {
+  if (normalized.includes('tele') || normalized.includes('t.me') || normalized === 'send') {
     return (
       <svg
         width={dim}

@@ -5,9 +5,11 @@ import fs from 'fs'
 import path from 'path'
 
 export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
-const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
-const MAX_SIZE_BYTES = 10 * 1024 * 1024 // 10MB
+// Supabase gallery bucket allowed MIME types
+const SUPABASE_ALLOWED_MIMES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
+const MAX_SIZE_BYTES = 25 * 1024 * 1024 // 25MB for modern phone camera shots
 
 function getServiceSupabase() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -29,10 +31,8 @@ export async function POST(req: NextRequest) {
   if (!isAuthenticated) {
     const supabase = getServiceSupabase()
     if (supabase) {
-      // In production, verify user
       isAuthenticated = true
     } else {
-      // In local dev mode without Supabase, allow admin actions
       isAuthenticated = true
     }
   }
@@ -53,15 +53,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'No file provided.' }, { status: 422 })
   }
 
-  // Validate MIME type
-  if (!ALLOWED_MIME_TYPES.includes(file.type)) {
-    return NextResponse.json(
-      { error: `File type not allowed. Accepted: ${ALLOWED_MIME_TYPES.join(', ')}` },
-      { status: 422 }
-    )
-  }
-
-  // Validate size
+  // Validate size (up to 25MB)
   if (file.size > MAX_SIZE_BYTES) {
     return NextResponse.json(
       { error: `File too large. Maximum allowed size is ${MAX_SIZE_BYTES / 1024 / 1024}MB.` },
@@ -69,7 +61,38 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  const ext = file.type.split('/')[1] || 'jpg'
+  // Normalize MIME type from phone / camera / browser
+  let rawType = (file.type || '').toLowerCase().trim().split(';')[0]
+  const fileName = (file.name || '').toLowerCase()
+
+  if (!rawType || rawType === 'application/octet-stream') {
+    if (fileName.endsWith('.jpg') || fileName.endsWith('.jpeg')) rawType = 'image/jpeg'
+    else if (fileName.endsWith('.png')) rawType = 'image/png'
+    else if (fileName.endsWith('.webp')) rawType = 'image/webp'
+    else if (fileName.endsWith('.gif')) rawType = 'image/gif'
+    else if (fileName.endsWith('.heic') || fileName.endsWith('.heif')) rawType = 'image/jpeg'
+    else rawType = 'image/jpeg'
+  }
+
+  // Normalize image types for Supabase Storage bucket compatibility
+  let storageContentType = 'image/jpeg'
+  let ext = 'jpg'
+
+  if (rawType.includes('png')) {
+    storageContentType = 'image/png'
+    ext = 'png'
+  } else if (rawType.includes('webp')) {
+    storageContentType = 'image/webp'
+    ext = 'webp'
+  } else if (rawType.includes('gif')) {
+    storageContentType = 'image/gif'
+    ext = 'gif'
+  } else {
+    // jpg, jpeg, pjpeg, jfif, heic, heif, etc.
+    storageContentType = 'image/jpeg'
+    ext = 'jpg'
+  }
+
   const timestamp = Date.now()
   const randomSuffix = Math.random().toString(36).slice(2, 8)
   const filename = `${timestamp}-${randomSuffix}.${ext}`
@@ -85,8 +108,8 @@ export async function POST(req: NextRequest) {
       const { error: uploadError } = await supabase.storage
         .from('gallery')
         .upload(storagePath, buffer, {
-          contentType: file.type,
-          upsert: false,
+          contentType: storageContentType,
+          upsert: true,
         })
 
       if (!uploadError) {
@@ -94,14 +117,24 @@ export async function POST(req: NextRequest) {
           .from('gallery')
           .getPublicUrl(storagePath)
 
-        return NextResponse.json({
-          success: true,
-          storagePath,
-          publicUrl,
-        })
+        return NextResponse.json(
+          {
+            success: true,
+            storagePath,
+            publicUrl,
+            url: publicUrl,
+          },
+          {
+            headers: {
+              'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
+            },
+          }
+        )
+      } else {
+        console.warn('Supabase storage upload error:', uploadError)
       }
     } catch (e) {
-      console.warn('Supabase upload failed, falling back to local storage:', e)
+      console.warn('Supabase upload exception, falling back to local storage:', e)
     }
   }
 
@@ -116,11 +149,19 @@ export async function POST(req: NextRequest) {
     fs.writeFileSync(filePath, buffer)
 
     const publicUrl = `/uploads/${filename}`
-    return NextResponse.json({
-      success: true,
-      storagePath: `uploads/${filename}`,
-      publicUrl,
-    })
+    return NextResponse.json(
+      {
+        success: true,
+        storagePath: `uploads/${filename}`,
+        publicUrl,
+        url: publicUrl,
+      },
+      {
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
+        },
+      }
+    )
   } catch (err) {
     console.error('[upload POST] local storage error:', err)
     return NextResponse.json({ error: 'Failed to save uploaded file.' }, { status: 500 })

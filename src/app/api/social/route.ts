@@ -3,6 +3,13 @@ import { getSocialProfiles, saveSocialProfiles, type SocialProfileData } from '@
 import { createClient as createServiceClient } from '@supabase/supabase-js'
 
 export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
+const NO_CACHE_HEADERS = {
+  'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+  Pragma: 'no-cache',
+  Expires: '0',
+}
 
 function getServiceSupabase() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -24,10 +31,10 @@ export async function GET(req: NextRequest) {
     const profiles = await getSocialProfiles()
     const filtered = showAll ? profiles : profiles.filter((p) => p.is_visible)
 
-    return NextResponse.json({ data: filtered })
+    return NextResponse.json({ data: filtered }, { headers: NO_CACHE_HEADERS })
   } catch (err) {
     console.error('[social GET] error:', err)
-    return NextResponse.json({ error: 'Failed to fetch social profiles' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to fetch social profiles' }, { status: 500, headers: NO_CACHE_HEADERS })
   }
 }
 
@@ -77,10 +84,10 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    return NextResponse.json({ data: newProfile, success: true }, { status: 201 })
+    return NextResponse.json({ data: newProfile, success: true }, { status: 201, headers: NO_CACHE_HEADERS })
   } catch (err) {
     console.error('[social POST] error:', err)
-    return NextResponse.json({ error: 'Failed to create social profile' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to create social profile' }, { status: 500, headers: NO_CACHE_HEADERS })
   }
 }
 
@@ -89,13 +96,13 @@ export async function PUT(req: NextRequest) {
   try {
     const body = await req.json()
     if (!Array.isArray(body)) {
-      return NextResponse.json({ error: 'Expected an array of profiles' }, { status: 400 })
+      return NextResponse.json({ error: 'Expected an array of profiles' }, { status: 400, headers: NO_CACHE_HEADERS })
     }
 
     await saveSocialProfiles(body as SocialProfileData[])
-    return NextResponse.json({ data: body, success: true })
+    return NextResponse.json({ data: body, success: true }, { headers: NO_CACHE_HEADERS })
   } catch (err) {
     console.error('[social PUT] error:', err)
-    return NextResponse.json({ error: 'Failed to update social profiles' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to update social profiles' }, { status: 500, headers: NO_CACHE_HEADERS })
   }
 }

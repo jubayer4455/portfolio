@@ -32,6 +32,7 @@ import DataBackupExport from '@/components/admin/DataBackupExport'
 import MasterControlBar from '@/components/admin/MasterControlBar'
 
 export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 function getServiceSupabase() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co'
@@ -248,7 +249,7 @@ export default async function AdminDashboard() {
                 <div key={s.id} className="space-y-1">
                   <div className="flex items-center justify-between text-xs">
                     <div className="flex items-center gap-2">
-                      <PlatformIcon name={s.icon_name || s.platform} size={14} style={{ color: s.color }} />
+                      <PlatformIcon platform={s.platform} name={s.icon_name || s.platform} size={16} />
                       <span className="text-white font-medium">{s.display_label || s.platform}</span>
                     </div>
                     <span className="text-emerald-400 font-mono font-semibold">{count}</span>

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import {
-  readAllFeaturedProjects,
+  getFeaturedProjects,
   saveFeaturedProject,
   deleteFeaturedProject,
   getDomainLogoUrl,
@@ -10,6 +10,13 @@ import {
 import { createServerClient } from '@supabase/ssr'
 
 export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
+const NO_CACHE_HEADERS = {
+  'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+  Pragma: 'no-cache',
+  Expires: '0',
+}
 
 async function checkAdminAuth() {
   const cookieStore = await cookies()
@@ -41,15 +48,15 @@ async function checkAdminAuth() {
 
 // GET all projects (public or admin)
 export async function GET() {
-  const projects = readAllFeaturedProjects()
-  return NextResponse.json({ success: true, data: projects })
+  const projects = await getFeaturedProjects()
+  return NextResponse.json({ success: true, data: projects }, { headers: NO_CACHE_HEADERS })
 }
 
 // POST create new project (admin protected)
 export async function POST(req: NextRequest) {
   const isAuthed = await checkAdminAuth()
   if (!isAuthed) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401, headers: NO_CACHE_HEADERS })
   }
 
   try {
@@ -57,7 +64,7 @@ export async function POST(req: NextRequest) {
     const { title, url, description, category, tags, preview_image, is_featured, logo_url } = body
 
     if (!title || !url) {
-      return NextResponse.json({ error: 'Title and URL are required' }, { status: 400 })
+      return NextResponse.json({ error: 'Title and URL are required' }, { status: 400, headers: NO_CACHE_HEADERS })
     }
 
     const saved = await saveFeaturedProject({
@@ -71,9 +78,9 @@ export async function POST(req: NextRequest) {
       is_featured: is_featured !== false,
     })
 
-    return NextResponse.json({ success: true, data: saved })
+    return NextResponse.json({ success: true, data: saved }, { headers: NO_CACHE_HEADERS })
   } catch (err: any) {
-    return NextResponse.json({ error: err.message || 'Failed to save project' }, { status: 500 })
+    return NextResponse.json({ error: err.message || 'Failed to save project' }, { status: 500, headers: NO_CACHE_HEADERS })
   }
 }
 
@@ -81,13 +88,13 @@ export async function POST(req: NextRequest) {
 export async function PATCH(req: NextRequest) {
   const isAuthed = await checkAdminAuth()
   if (!isAuthed) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401, headers: NO_CACHE_HEADERS })
   }
 
   try {
     const body = await req.json()
     if (!body.id) {
-      return NextResponse.json({ error: 'Project ID is required' }, { status: 400 })
+      return NextResponse.json({ error: 'Project ID is required' }, { status: 400, headers: NO_CACHE_HEADERS })
     }
 
     if (body.tags && typeof body.tags === 'string') {
@@ -95,9 +102,9 @@ export async function PATCH(req: NextRequest) {
     }
 
     const saved = await saveFeaturedProject(body)
-    return NextResponse.json({ success: true, data: saved })
+    return NextResponse.json({ success: true, data: saved }, { headers: NO_CACHE_HEADERS })
   } catch (err: any) {
-    return NextResponse.json({ error: err.message || 'Failed to update project' }, { status: 500 })
+    return NextResponse.json({ error: err.message || 'Failed to update project' }, { status: 500, headers: NO_CACHE_HEADERS })
   }
 }
 
@@ -105,7 +112,7 @@ export async function PATCH(req: NextRequest) {
 export async function DELETE(req: NextRequest) {
   const isAuthed = await checkAdminAuth()
   if (!isAuthed) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401, headers: NO_CACHE_HEADERS })
   }
 
   try {
@@ -113,12 +120,12 @@ export async function DELETE(req: NextRequest) {
     const id = searchParams.get('id')
 
     if (!id) {
-      return NextResponse.json({ error: 'Project ID is required' }, { status: 400 })
+      return NextResponse.json({ error: 'Project ID is required' }, { status: 400, headers: NO_CACHE_HEADERS })
     }
 
     const ok = await deleteFeaturedProject(id)
-    return NextResponse.json({ success: ok })
+    return NextResponse.json({ success: ok }, { headers: NO_CACHE_HEADERS })
   } catch (err: any) {
-    return NextResponse.json({ error: err.message || 'Failed to delete project' }, { status: 500 })
+    return NextResponse.json({ error: err.message || 'Failed to delete project' }, { status: 500, headers: NO_CACHE_HEADERS })
   }
 }

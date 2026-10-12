@@ -48,7 +48,9 @@ export default function AdminGalleryPage() {
 
   const fetchImages = async () => {
     try {
-      const res = await fetch('/api/gallery?all=true')
+      const res = await fetch(`/api/gallery?all=true&_t=${Date.now()}`, {
+        cache: 'no-store',
+      })
       const json = await res.json()
       if (json.data) {
         setImages(json.data)

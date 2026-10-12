@@ -60,7 +60,9 @@ export default function AdminProfilePage() {
   useEffect(() => {
     async function loadData() {
       try {
-        const res = await fetch('/api/admin/profile')
+        const res = await fetch(`/api/admin/profile?_t=${Date.now()}`, {
+          cache: 'no-store',
+        })
         const json = await res.json()
         if (json.data) {
           const s = json.data as SiteSettingsData
@@ -102,8 +104,9 @@ export default function AdminProfilePage() {
       })
       const data = await res.json()
 
-      if (res.ok && data.url) {
-        setAvatarUrl(data.url)
+      const uploadedUrl = data.publicUrl || data.url
+      if (res.ok && uploadedUrl) {
+        setAvatarUrl(uploadedUrl)
         setStatus('success')
         setStatusMessage('Avatar photo uploaded successfully! Click "Save Changes" to apply.')
       } else {

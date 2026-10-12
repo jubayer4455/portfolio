@@ -218,9 +218,9 @@ export default function HeroSection({ settings, socials }: HeroSectionProps) {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={item.display_label || item.platform}
-                  className="w-10 h-10 rounded-xl glass flex items-center justify-center text-white/60 hover:text-orange-400 hover:border-orange-500/40 hover:bg-orange-500/5 transition-all duration-300 hover:scale-110 shadow-sm"
+                  className="w-10 h-10 rounded-xl glass border border-white/10 flex items-center justify-center hover:border-white/30 hover:bg-white/[0.08] transition-all duration-300 hover:scale-110 shadow-sm"
                 >
-                  <PlatformIcon name={item.icon_name || item.platform} size={18} />
+                  <PlatformIcon platform={item.platform || item.display_label} name={item.icon_name || item.platform} size={20} />
                 </a>
               ))}
             </motion.div>

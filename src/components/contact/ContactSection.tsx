@@ -232,7 +232,7 @@ export default function ContactSection({ settings, socials }: ContactSectionProp
                       rel="noopener noreferrer"
                       className="px-3.5 py-1.5 rounded-full glass border border-white/10 text-white/70 hover:text-white hover:border-orange-500/40 text-xs font-medium flex items-center gap-2 transition-all hover:scale-105"
                     >
-                      <PlatformIcon name={s.icon_name || s.platform} size={13} style={{ color: s.color }} />
+                      <PlatformIcon platform={s.platform || s.display_label} name={s.icon_name || s.platform} size={15} />
                       <span>{s.display_label || s.platform}</span>
                     </a>
                   ))}

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import {
   Save,
@@ -26,6 +26,9 @@ import {
   Send,
   Music,
   Globe,
+  Camera,
+  Upload,
+  RefreshCw,
 } from 'lucide-react'
 import type { SiteSettingsData } from '@/lib/content-store'
 
@@ -76,26 +79,83 @@ const defaultSettings: SiteSettingsData = {
 export default function AdminSettingsPage() {
   const [settings, setSettings] = useState<SiteSettingsData>(defaultSettings)
   const [loading, setLoading] = useState(true)
+  const [refreshing, setRefreshing] = useState(false)
   const [saving, setSaving] = useState(false)
   const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle')
   const [message, setMessage] = useState('')
+  const [uploadingAvatar, setUploadingAvatar] = useState(false)
+  const [uploadError, setUploadError] = useState('')
+
+  const avatarFileInputRef = useRef<HTMLInputElement>(null)
+
+  const fetchSettings = async (showRefreshSpinner = false) => {
+    if (showRefreshSpinner) setRefreshing(true)
+    try {
+      const res = await fetch(`/api/settings?_t=${Date.now()}`, {
+        cache: 'no-store',
+      })
+      const json = await res.json()
+      if (json.data) {
+        setSettings((prev) => ({ ...prev, ...json.data }))
+        if (showRefreshSpinner) {
+          setStatus('success')
+          setMessage('Live settings synced successfully from cloud!')
+        }
+      }
+    } catch (err) {
+      console.error('Failed to load settings:', err)
+      if (showRefreshSpinner) {
+        setStatus('error')
+        setMessage('Failed to sync settings from cloud.')
+      }
+    } finally {
+      setLoading(false)
+      setRefreshing(false)
+    }
+  }
 
   useEffect(() => {
-    async function fetchSettings() {
-      try {
-        const res = await fetch('/api/settings')
-        const json = await res.json()
-        if (json.data) {
-          setSettings((prev) => ({ ...prev, ...json.data }))
-        }
-      } catch (err) {
-        console.error('Failed to load settings:', err)
-      } finally {
-        setLoading(false)
-      }
-    }
     fetchSettings()
   }, [])
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setUploadingAvatar(true)
+    setUploadError('')
+    setStatus('idle')
+
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      })
+
+      const data = await res.json()
+      if (res.ok && (data.publicUrl || data.url)) {
+        const uploadedUrl = data.publicUrl || data.url
+        handleChange('avatar_url', uploadedUrl)
+        setStatus('success')
+        setMessage('Photo uploaded! Click "Save Changes" at the bottom to apply to live site.')
+      } else {
+        throw new Error(data.error || 'Upload failed')
+      }
+    } catch (err: any) {
+      console.error('Avatar upload failed:', err)
+      setUploadError(err.message || 'Failed to upload photo')
+      setStatus('error')
+      setMessage(err.message || 'Failed to upload image')
+    } finally {
+      setUploadingAvatar(false)
+      if (avatarFileInputRef.current) {
+        avatarFileInputRef.current.value = ''
+      }
+    }
+  }
 
   const handleChange = (field: keyof SiteSettingsData, value: string | boolean) => {
     setSettings((prev) => ({ ...prev, [field]: value }))
@@ -145,11 +205,23 @@ export default function AdminSettingsPage() {
 
   return (
     <div className="space-y-8 max-w-3xl">
-      <div>
-        <h1 className="text-white text-2xl font-bold font-display">Personal Bio Settings</h1>
-        <p className="text-white/40 mt-1 text-sm">
-          Everything you edit here immediately updates your live Link-in-Bio profile on the web.
-        </p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <h1 className="text-white text-2xl font-bold font-display">Personal Bio Settings</h1>
+          <p className="text-white/40 mt-1 text-sm">
+            Everything you edit here immediately updates your live Link-in-Bio profile on the web.
+          </p>
+        </div>
+        <button
+          type="button"
+          disabled={refreshing}
+          onClick={() => fetchSettings(true)}
+          className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl glass border border-white/10 hover:border-orange-500/40 text-white/80 hover:text-white text-xs font-medium transition-all active:scale-95 disabled:opacity-50 self-start sm:self-auto"
+          title="Force refresh live data from Supabase across all devices"
+        >
+          <RefreshCw size={13} className={refreshing ? 'animate-spin text-orange-400' : 'text-orange-400'} />
+          <span>{refreshing ? 'Syncing...' : 'Sync Live Cloud Data'}</span>
+        </button>
       </div>
 
       {/* Live Profile Header Preview */}
@@ -470,18 +542,109 @@ export default function AdminSettingsPage() {
 
           <div>
             <label className="block text-white/60 text-xs font-medium mb-2 uppercase tracking-wider">
-              Profile Photo / Avatar Image URL
+              Profile Photo / Avatar Image (Upload from Phone or URL)
             </label>
-            <input
-              type="text"
-              value={settings.avatar_url || ''}
-              onChange={(e) => handleChange('avatar_url', e.target.value)}
-              className={inputClass}
-              placeholder="https://images.unsplash.com/... or your photo URL"
-            />
-            <p className="text-white/30 text-xs mt-1">
-              Paste any public image link (Unsplash, Imgur, Supabase, etc.)
-            </p>
+
+            <div className="p-4 rounded-xl bg-white/[0.03] border border-white/[0.08] mb-3 space-y-3">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                {/* Avatar Preview */}
+                <div className="relative w-20 h-20 rounded-2xl overflow-hidden glass border-2 border-orange-500/40 flex-shrink-0 bg-neutral-900 shadow-md">
+                  {settings.avatar_url ? (
+                    <Image
+                      src={settings.avatar_url}
+                      alt="Profile Avatar"
+                      fill
+                      className="object-cover"
+                      unoptimized
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-white/30 text-xs font-mono">
+                      No Photo
+                    </div>
+                  )}
+                  {uploadingAvatar && (
+                    <div className="absolute inset-0 bg-black/75 flex flex-col items-center justify-center text-orange-400">
+                      <Loader2 size={20} className="animate-spin" />
+                    </div>
+                  )}
+                </div>
+
+                {/* Upload Controls for Mobile & Desktop */}
+                <div className="flex-1 space-y-2">
+                  <input
+                    ref={avatarFileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleAvatarUpload}
+                    className="hidden"
+                    id="mobile-avatar-file-input"
+                  />
+
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      disabled={uploadingAvatar}
+                      onClick={() => {
+                        if (avatarFileInputRef.current) {
+                          avatarFileInputRef.current.click()
+                        }
+                      }}
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 active:scale-95 text-white font-medium text-xs shadow-lg transition-all disabled:opacity-50 cursor-pointer"
+                    >
+                      {uploadingAvatar ? (
+                        <>
+                          <Loader2 size={14} className="animate-spin" />
+                          <span>Uploading Photo...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Camera size={14} />
+                          <span>Upload Photo / Camera</span>
+                        </>
+                      )}
+                    </button>
+
+                    <button
+                      type="button"
+                      disabled={uploadingAvatar}
+                      onClick={() => {
+                        if (avatarFileInputRef.current) {
+                          avatarFileInputRef.current.click()
+                        }
+                      }}
+                      className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl glass border border-white/10 hover:border-white/30 text-white/80 hover:text-white active:scale-95 text-xs font-medium transition-all disabled:opacity-50 cursor-pointer"
+                    >
+                      <Upload size={14} />
+                      <span>Choose from Gallery</span>
+                    </button>
+                  </div>
+
+                  <p className="text-white/40 text-[11px]">
+                    Supports direct mobile camera photos, iPhone HEIC, JPG, PNG &amp; WebP (up to 25MB).
+                  </p>
+
+                  {uploadError && (
+                    <p className="text-red-400 text-xs font-medium flex items-center gap-1">
+                      <AlertCircle size={12} /> {uploadError}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {/* Direct image link */}
+              <div className="pt-2 border-t border-white/[0.04]">
+                <label className="block text-white/40 text-[11px] font-medium mb-1">
+                  Or Paste Direct Image Link:
+                </label>
+                <input
+                  type="text"
+                  value={settings.avatar_url || ''}
+                  onChange={(e) => handleChange('avatar_url', e.target.value)}
+                  className={inputClass}
+                  placeholder="https://images.unsplash.com/... or Supabase public URL"
+                />
+              </div>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
