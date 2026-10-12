@@ -135,7 +135,7 @@ export default async function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${playfair.variable} scroll-smooth`}
+      className={`${inter.variable} ${playfair.variable}`}
       suppressHydrationWarning
     >
       <head>

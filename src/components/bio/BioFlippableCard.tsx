@@ -39,6 +39,7 @@ export default function BioFlippableCard({
 
   // Gentle 3D tactile parallax (solid, realistic, no flipping)
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (typeof window !== 'undefined' && window.matchMedia('(hover: none)').matches) return
     if (!cardRef.current) return
     const rect = cardRef.current.getBoundingClientRect()
     const x = e.clientX - rect.left

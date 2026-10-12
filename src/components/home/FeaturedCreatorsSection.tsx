@@ -58,6 +58,8 @@ export default function FeaturedCreatorsSection({ featuredUsers }: Props) {
                     src={user.cover_url}
                     alt={user.display_name}
                     fill
+                    loading="lazy"
+                    sizes="(max-width: 768px) 100vw, 33vw"
                     className="object-cover group-hover:scale-105 transition-transform duration-500"
                     unoptimized
                   />
@@ -79,6 +81,8 @@ export default function FeaturedCreatorsSection({ featuredUsers }: Props) {
                             src={user.avatar_url}
                             alt={user.display_name}
                             fill
+                            loading="lazy"
+                            sizes="64px"
                             className="object-cover"
                             unoptimized
                           />

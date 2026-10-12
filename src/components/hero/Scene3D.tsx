@@ -123,35 +123,38 @@ function OrangeRing() {
 }
 
 // ── Inner canvas scene ───────────────────────────────────────────────────────
+// ── Inner canvas scene ───────────────────────────────────────────────────────
 function SceneContent({ isMobile }: { isMobile: boolean }) {
   return (
     <>
-      <ambientLight intensity={0.3} />
+      <ambientLight intensity={0.4} />
       <directionalLight
         position={[5, 5, 5]}
         intensity={1.2}
         color="#F97316"
-        castShadow
-        shadow-mapSize-width={1024}
-        shadow-mapSize-height={1024}
+        castShadow={!isMobile}
+        shadow-mapSize-width={isMobile ? 512 : 1024}
+        shadow-mapSize-height={isMobile ? 512 : 1024}
       />
-      <directionalLight position={[-5, -3, -5]} intensity={0.4} color="#ffffff" />
-      <pointLight position={[0, 0, 3]} intensity={0.8} color="#F97316" distance={8} />
+      <directionalLight position={[-5, -3, -5]} intensity={0.3} color="#ffffff" />
+      <pointLight position={[0, 0, 3]} intensity={0.7} color="#F97316" distance={8} />
 
       <IcosahedronMesh />
       <OrangeRing />
-      <ParticleField count={isMobile ? 60 : 120} />
+      <ParticleField count={isMobile ? 25 : 100} />
 
-      <OrbitControls
-        autoRotate={false}
-        enableZoom={false}
-        enablePan={false}
-        enableRotate
-        dampingFactor={0.05}
-        enableDamping
-        maxPolarAngle={Math.PI / 1.5}
-        minPolarAngle={Math.PI / 3}
-      />
+      {!isMobile && (
+        <OrbitControls
+          autoRotate={false}
+          enableZoom={false}
+          enablePan={false}
+          enableRotate
+          dampingFactor={0.05}
+          enableDamping
+          maxPolarAngle={Math.PI / 1.5}
+          minPolarAngle={Math.PI / 3}
+        />
+      )}
     </>
   )
 }
@@ -159,26 +162,44 @@ function SceneContent({ isMobile }: { isMobile: boolean }) {
 // ── Default export ───────────────────────────────────────────────────────────
 export default function Scene3D() {
   const [isMobile, setIsMobile] = useState(false)
+  const [isInView, setIsInView] = useState(true)
+  const containerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768)
     check()
-    window.addEventListener('resize', check)
+    window.addEventListener('resize', check, { passive: true })
     return () => window.removeEventListener('resize', check)
   }, [])
 
+  useEffect(() => {
+    if (!containerRef.current) return
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsInView(entry.isIntersecting)
+      },
+      { threshold: 0.05 }
+    )
+    observer.observe(containerRef.current)
+    return () => observer.disconnect()
+  }, [])
+
   return (
-    <Canvas
-      shadows
-      camera={{ position: [0, 0, 5], fov: 50 }}
-      style={{ background: 'transparent' }}
-      gl={{
-        alpha: true,
-        antialias: true,
-        powerPreference: 'high-performance',
-      }}
-    >
-      <SceneContent isMobile={isMobile} />
-    </Canvas>
+    <div ref={containerRef} className="w-full h-full pointer-events-none select-none">
+      <Canvas
+        frameloop={isInView ? 'always' : 'never'}
+        shadows={!isMobile}
+        dpr={isMobile ? [1, 1.25] : [1, 2]}
+        camera={{ position: [0, 0, 5], fov: 50 }}
+        style={{ pointerEvents: 'none' }}
+        gl={{
+          alpha: true,
+          antialias: !isMobile,
+          powerPreference: isMobile ? 'low-power' : 'high-performance',
+        }}
+      >
+        <SceneContent isMobile={isMobile} />
+      </Canvas>
+    </div>
   )
 }

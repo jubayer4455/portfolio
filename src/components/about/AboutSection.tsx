@@ -89,15 +89,15 @@ export default function AboutSection({ settings }: { settings?: SiteSettingsData
             <motion.div variants={itemVariants} className="lg:col-span-5 relative">
               <div className="relative rounded-3xl overflow-hidden glass gradient-border shadow-2xl p-3 sm:p-4">
                 <div className="relative aspect-[4/5] rounded-2xl overflow-hidden bg-neutral-900">
-                  <Image
-                    src={avatarUrl}
-                    alt={fullName}
-                    fill
-                    unoptimized
-                    sizes="(max-width: 768px) 100vw, 400px"
-                    className="object-cover transition-transform duration-700 hover:scale-105"
-                    priority
-                  />
+                    <Image
+                      src={avatarUrl}
+                      alt={fullName}
+                      fill
+                      unoptimized
+                      loading="lazy"
+                      sizes="(max-width: 768px) 100vw, 400px"
+                      className="object-cover transition-transform duration-700 hover:scale-105"
+                    />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20" />
 
                   {/* Top verified badge */}

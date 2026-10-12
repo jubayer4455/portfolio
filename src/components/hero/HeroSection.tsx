@@ -74,7 +74,7 @@ export default function HeroSection({ settings, socials }: HeroSectionProps) {
         aria-label="Hero profile section"
       >
         {/* 3D Scene background */}
-        <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 z-0 pointer-events-none select-none">
           <Scene3D />
         </div>
 

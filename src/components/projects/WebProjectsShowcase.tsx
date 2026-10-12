@@ -172,6 +172,8 @@ export default function WebProjectsShowcase({ projects, title, subtitle }: Props
                           src={project.preview_image}
                           alt={project.title}
                           fill
+                          loading="lazy"
+                          sizes="(max-width: 768px) 100vw, 33vw"
                           className="object-cover group-hover:scale-105 transition-transform duration-500"
                           unoptimized
                         />

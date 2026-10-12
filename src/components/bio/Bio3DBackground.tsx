@@ -47,8 +47,10 @@ export default function Bio3DBackground({ style = 'particles', glowColor = 'rgba
     else if (glowColor.includes('16,185,129')) { r = 16; g = 185; b = 129 } // emerald
     else if (glowColor.includes('244,63,94')) { r = 244; g = 63; b = 94 } // rose
 
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768
+
     // 1. PARTICLES INITIALIZATION
-    const particlesCount = 85
+    const particlesCount = isMobile ? 30 : 75
     const particles: Array<{
       x: number
       y: number
@@ -177,8 +179,10 @@ export default function Bio3DBackground({ style = 'particles', glowColor = 'rgba
 
         ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, 0.35)`
         ctx.lineWidth = 1.5
-        ctx.shadowColor = `rgba(${r}, ${g}, ${b}, 0.8)`
-        ctx.shadowBlur = 12
+        if (!isMobile) {
+          ctx.shadowColor = `rgba(${r}, ${g}, ${b}, 0.8)`
+          ctx.shadowBlur = 12
+        }
 
         edges.forEach(([start, end]) => {
           ctx.beginPath()
@@ -193,8 +197,10 @@ export default function Bio3DBackground({ style = 'particles', glowColor = 'rgba
         ctx.beginPath()
         ctx.lineWidth = 2
         ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, 0.2)`
-        ctx.shadowColor = `rgba(${r}, ${g}, ${b}, 0.5)`
-        ctx.shadowBlur = 10
+        if (!isMobile) {
+          ctx.shadowColor = `rgba(${r}, ${g}, ${b}, 0.5)`
+          ctx.shadowBlur = 10
+        }
 
         for (let x = 0; x < width; x += 15) {
           const y = height * 0.35 + Math.sin(x * 0.005 + angle) * 40 + Math.cos(x * 0.01 + angle * 0.5) * 20 + offsetY

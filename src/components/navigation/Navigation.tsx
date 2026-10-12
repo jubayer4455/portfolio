@@ -27,19 +27,28 @@ export default function Navigation({ settings }: { settings?: SiteSettingsData }
   const [activeSection, setActiveSection] = useState('home')
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20)
+    let ticking = false
 
-      // Determine active section
-      const sections = ['social', 'gallery', 'reviews', 'faq', 'about', 'contact']
-      let current = 'home'
-      for (const id of sections) {
-        const el = document.getElementById(id)
-        if (el && window.scrollY >= el.offsetTop - 120) {
-          current = id
-        }
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const scrollY = window.scrollY
+          const shouldBeScrolled = scrollY > 20
+          setIsScrolled((prev) => (prev !== shouldBeScrolled ? shouldBeScrolled : prev))
+
+          const sections = ['projects', 'social', 'gallery', 'reviews', 'faq', 'about', 'contact']
+          let current = 'home'
+          for (const id of sections) {
+            const el = document.getElementById(id)
+            if (el && scrollY >= el.offsetTop - 150) {
+              current = id
+            }
+          }
+          setActiveSection((prev) => (prev !== current ? current : prev))
+          ticking = false
+        })
+        ticking = true
       }
-      setActiveSection(current)
     }
 
     window.addEventListener('scroll', handleScroll, { passive: true })

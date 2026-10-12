@@ -117,6 +117,8 @@ export default function ReviewsSection({ initialReviews = [] }: ReviewsSectionPr
                           src={rev.user_photo}
                           alt={rev.user_name}
                           fill
+                          loading="lazy"
+                          sizes="40px"
                           className="object-cover"
                           unoptimized
                         />

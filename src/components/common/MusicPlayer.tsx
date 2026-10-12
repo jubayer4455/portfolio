@@ -70,7 +70,7 @@ export default function MusicPlayer({
   if (!enabled) return null
 
   return (
-    <div className="fixed bottom-5 left-5 z-40 select-none">
+    <div className="fixed bottom-5 left-5 z-40 select-none transform-gpu">
       <motion.div
         initial={{ opacity: 0, y: 20, scale: 0.9 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
