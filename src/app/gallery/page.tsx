@@ -2,6 +2,9 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
+import { cookies } from 'next/headers'
+import { getSiteSettings } from '@/lib/content-store'
+import MaintenanceScreen from '@/components/common/MaintenanceScreen'
 import type { GalleryImage } from '@/types'
 
 export const metadata: Metadata = {
@@ -157,8 +160,23 @@ async function getGalleryImages(): Promise<GalleryImage[]> {
 }
 
 export default async function GalleryPage() {
-  const images = await getGalleryImages()
+  const [settings, images] = await Promise.all([getSiteSettings(), getGalleryImages()])
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://jubayer.me'
+
+  const cookieStore = cookies()
+  const isDemoAdmin = cookieStore.get('demo_admin')?.value === 'true'
+  const sessionUser = cookieStore.get('user_session_username')?.value
+  const sessionEmail = cookieStore.get('user_session_email')?.value
+  const isAdmin =
+    isDemoAdmin ||
+    sessionUser === 'admin' ||
+    sessionUser === 'jubayer' ||
+    sessionEmail === 'admin@portfolio.com' ||
+    sessionEmail === 'jubayerahmmed2k@gmail.com'
+
+  if (settings.maintenance_mode_enabled && !isAdmin) {
+    return <MaintenanceScreen settings={settings} />
+  }
 
   return (
     <>

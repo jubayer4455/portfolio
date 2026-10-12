@@ -4,6 +4,7 @@ import {
   saveAnonymousMessages,
   addAnonymousMessage,
 } from '@/lib/content-store'
+import { sendAnonymousNoteTelegramAlert } from '@/lib/telegram'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -36,6 +37,13 @@ export async function POST(req: NextRequest) {
     }
 
     const newMsg = await addAnonymousMessage(message, emoji || '💭')
+
+    // Dispatch Telegram alert asynchronously without blocking client
+    sendAnonymousNoteTelegramAlert({
+      message: newMsg.message,
+      emoji: newMsg.emoji,
+    }).catch((err) => console.warn('Telegram anonymous note notification failed:', err))
+
     return NextResponse.json({ success: true, data: newMsg }, { headers: noCacheHeaders })
   } catch (err: any) {
     console.error('[messages/anonymous POST] error:', err)

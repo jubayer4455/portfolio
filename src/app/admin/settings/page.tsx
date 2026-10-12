@@ -29,6 +29,14 @@ import {
   Camera,
   Upload,
   RefreshCw,
+  Bell,
+  BellRing,
+  KeyRound,
+  Lock,
+  ShieldCheck,
+  AlertTriangle,
+  Shield,
+  Check,
 } from 'lucide-react'
 import type { SiteSettingsData } from '@/lib/content-store'
 
@@ -74,6 +82,16 @@ const defaultSettings: SiteSettingsData = {
   projects_subtitle: 'Live Web Portfolio',
   socials_title: 'Connect With Me',
   socials_subtitle: 'Official Links',
+
+  // Telegram Notifications
+  telegram_notifications_enabled: false,
+  telegram_bot_token: '',
+  telegram_chat_id: '',
+
+  // Maintenance Mode
+  maintenance_mode_enabled: false,
+  maintenance_title: "We're Upgrading the Experience ✨",
+  maintenance_message: 'Our creative portfolio is currently undergoing scheduled improvements to bring you fresh content, smoother animations, and exciting new work. We will be back online shortly!',
 }
 
 export default function AdminSettingsPage() {
@@ -85,6 +103,23 @@ export default function AdminSettingsPage() {
   const [message, setMessage] = useState('')
   const [uploadingAvatar, setUploadingAvatar] = useState(false)
   const [uploadError, setUploadError] = useState('')
+
+  // Telegram Test State
+  const [telegramTesting, setTelegramTesting] = useState(false)
+  const [telegramTestStatus, setTelegramTestStatus] = useState<'idle' | 'success' | 'error'>('idle')
+  const [telegramTestMessage, setTelegramTestMessage] = useState('')
+  const [showBotToken, setShowBotToken] = useState(false)
+
+  // Password Change State
+  const [currentPassword, setCurrentPassword] = useState('')
+  const [newPassword, setNewPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [passwordChanging, setPasswordChanging] = useState(false)
+  const [passwordStatus, setPasswordStatus] = useState<'idle' | 'success' | 'error'>('idle')
+  const [passwordMessage, setPasswordMessage] = useState('')
+  const [showCurrentPass, setShowCurrentPass] = useState(false)
+  const [showNewPass, setShowNewPass] = useState(false)
+  const [showConfirmPass, setShowConfirmPass] = useState(false)
 
   const avatarFileInputRef = useRef<HTMLInputElement>(null)
 
@@ -189,6 +224,93 @@ export default function AdminSettingsPage() {
     }
   }
 
+  const handleTestTelegram = async () => {
+    if (!settings.telegram_bot_token?.trim() || !settings.telegram_chat_id?.trim()) {
+      setTelegramTestStatus('error')
+      setTelegramTestMessage('Please enter both your Telegram Bot Token and Chat ID first.')
+      return
+    }
+
+    setTelegramTesting(true)
+    setTelegramTestStatus('idle')
+    setTelegramTestMessage('')
+
+    try {
+      const res = await fetch('/api/admin/telegram/test', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          botToken: settings.telegram_bot_token.trim(),
+          chatId: settings.telegram_chat_id.trim(),
+        }),
+      })
+
+      const data = await res.json()
+      if (!res.ok || data.error) {
+        throw new Error(data.error || 'Failed to send test alert.')
+      }
+
+      setTelegramTestStatus('success')
+      setTelegramTestMessage(data.message || 'Telegram alert delivered! Check your phone.')
+    } catch (err: any) {
+      setTelegramTestStatus('error')
+      setTelegramTestMessage(err.message || 'Could not connect to Telegram Bot API.')
+    } finally {
+      setTelegramTesting(false)
+    }
+  }
+
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!currentPassword) {
+      setPasswordStatus('error')
+      setPasswordMessage('Please enter your current admin password.')
+      return
+    }
+    if (newPassword.length < 6) {
+      setPasswordStatus('error')
+      setPasswordMessage('New password must be at least 6 characters long.')
+      return
+    }
+    if (newPassword !== confirmPassword) {
+      setPasswordStatus('error')
+      setPasswordMessage('New password and confirmation do not match.')
+      return
+    }
+
+    setPasswordChanging(true)
+    setPasswordStatus('idle')
+    setPasswordMessage('')
+
+    try {
+      const res = await fetch('/api/admin/security/password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          currentPassword,
+          newPassword,
+          confirmPassword,
+        }),
+      })
+
+      const data = await res.json()
+      if (!res.ok || data.error) {
+        throw new Error(data.error || 'Failed to change password.')
+      }
+
+      setPasswordStatus('success')
+      setPasswordMessage(data.message || 'Password changed successfully! You can now use your new password across all devices.')
+      setCurrentPassword('')
+      setNewPassword('')
+      setConfirmPassword('')
+    } catch (err: any) {
+      setPasswordStatus('error')
+      setPasswordMessage(err.message || 'Error occurred while updating password.')
+    } finally {
+      setPasswordChanging(false)
+    }
+  }
+
   const inputClass =
     'w-full px-4 py-3 rounded-xl glass border border-white/10 text-white placeholder-white/30 text-sm focus:outline-none focus:border-orange-500/60 transition-colors'
 
@@ -255,6 +377,90 @@ export default function AdminSettingsPage() {
       </div>
 
       <form onSubmit={handleSave} className="space-y-6">
+        {/* MASTER MAINTENANCE / COMING SOON MODE SWITCH */}
+        <div className={`glass gradient-border rounded-2xl p-6 space-y-5 transition-all duration-300 ${
+          settings.maintenance_mode_enabled
+            ? 'border-amber-500/50 bg-amber-500/[0.04]'
+            : 'border-white/10 bg-white/[0.01]'
+        }`}>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/[0.08] pb-4">
+            <div className="flex items-start gap-3">
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                settings.maintenance_mode_enabled
+                  ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                  : 'bg-white/5 text-white/40 border border-white/10'
+              }`}>
+                <AlertTriangle size={20} className={settings.maintenance_mode_enabled ? 'animate-pulse' : ''} />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-white font-bold text-lg">Maintenance / Coming Soon Mode</h2>
+                  <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                    settings.maintenance_mode_enabled
+                      ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40'
+                      : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                  }`}>
+                    <span className={`w-1.5 h-1.5 rounded-full ${settings.maintenance_mode_enabled ? 'bg-amber-400 animate-ping' : 'bg-emerald-400'}`} />
+                    {settings.maintenance_mode_enabled ? 'LOCKED / PRIVATE' : 'SITE IS LIVE'}
+                  </span>
+                </div>
+                <p className="text-white/40 text-xs mt-0.5">
+                  When enabled, public visitors are shown an aesthetic &quot;Coming Back Soon&quot; screen. You can still preview and edit the live site as Admin.
+                </p>
+              </div>
+            </div>
+
+            <label className="relative inline-flex items-center cursor-pointer self-start sm:self-auto">
+              <input
+                type="checkbox"
+                checked={settings.maintenance_mode_enabled === true}
+                onChange={(e) => handleChange('maintenance_mode_enabled', e.target.checked)}
+                className="sr-only peer"
+              />
+              <div className="w-12 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
+            </label>
+          </div>
+
+          {settings.maintenance_mode_enabled && (
+            <div className="space-y-4 pt-1 animate-fadeIn">
+              <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-300 flex items-center gap-2">
+                <AlertTriangle size={15} className="flex-shrink-0" />
+                <span>
+                  <b>Attention:</b> Visitors visiting your site now see the Coming Soon screen. Remember to click &quot;Save Changes&quot; below to apply.
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4">
+                <div>
+                  <label className="block text-white/60 text-xs font-medium mb-1.5 uppercase tracking-wider">
+                    Maintenance Page Headline
+                  </label>
+                  <input
+                    type="text"
+                    value={settings.maintenance_title || ''}
+                    onChange={(e) => handleChange('maintenance_title', e.target.value)}
+                    className={inputClass}
+                    placeholder="We're Upgrading the Experience ✨"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-white/60 text-xs font-medium mb-1.5 uppercase tracking-wider">
+                    Maintenance Message for Visitors
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={settings.maintenance_message || ''}
+                    onChange={(e) => handleChange('maintenance_message', e.target.value)}
+                    className={inputClass}
+                    placeholder="Our creative portfolio is currently undergoing scheduled improvements to bring you fresh content..."
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
         {/* 0. MASTER SECTION CONTROLS (SHOW/HIDE EVERYTHING & CUSTOM TITLES) */}
         <div className="glass gradient-border rounded-2xl p-6 space-y-6 border-orange-500/30 bg-orange-500/[0.02]">
           <div className="flex items-center justify-between border-b border-white/[0.08] pb-4">
@@ -856,6 +1062,126 @@ export default function AdminSettingsPage() {
           </div>
         </div>
 
+        {/* 3.5. TELEGRAM INSTANT NOTIFICATION ALERTS */}
+        <div className="glass gradient-border rounded-2xl p-6 space-y-5 border-blue-500/30 bg-blue-500/[0.02]">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/[0.08] pb-4">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-400 border border-blue-500/30 flex items-center justify-center flex-shrink-0">
+                <BellRing size={20} />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-white font-bold text-lg">Telegram Bot Instant Notifications</h2>
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] font-semibold">
+                    100% FREE &amp; INSTANT
+                  </span>
+                </div>
+                <p className="text-white/40 text-xs mt-0.5">
+                  Receive instant push alerts on your phone/desktop whenever someone sends you a Contact Message or drops an Anonymous Note.
+                </p>
+              </div>
+            </div>
+
+            <label className="relative inline-flex items-center cursor-pointer self-start sm:self-auto">
+              <input
+                type="checkbox"
+                checked={settings.telegram_notifications_enabled === true}
+                onChange={(e) => handleChange('telegram_notifications_enabled', e.target.checked)}
+                className="sr-only peer"
+              />
+              <div className="w-12 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
+            </label>
+          </div>
+
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-white/60 text-xs font-medium uppercase tracking-wider">
+                    Telegram Bot Token
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setShowBotToken(!showBotToken)}
+                    className="text-white/40 hover:text-white text-[11px] inline-flex items-center gap-1"
+                  >
+                    {showBotToken ? <EyeOff size={12} /> : <Eye size={12} />}
+                    <span>{showBotToken ? 'Hide' : 'Show'}</span>
+                  </button>
+                </div>
+                <input
+                  type={showBotToken ? 'text' : 'password'}
+                  value={settings.telegram_bot_token || ''}
+                  onChange={(e) => handleChange('telegram_bot_token', e.target.value)}
+                  className={inputClass}
+                  placeholder="e.g. 123456789:ABCdefGhIJKlmNoPQRstUVwxyZ"
+                />
+              </div>
+
+              <div>
+                <label className="block text-white/60 text-xs font-medium mb-1.5 uppercase tracking-wider">
+                  Your Telegram Chat ID
+                </label>
+                <input
+                  type="text"
+                  value={settings.telegram_chat_id || ''}
+                  onChange={(e) => handleChange('telegram_chat_id', e.target.value)}
+                  className={inputClass}
+                  placeholder="e.g. 987654321"
+                />
+              </div>
+            </div>
+
+            {/* Test button & feedback */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-2">
+              <button
+                type="button"
+                disabled={telegramTesting}
+                onClick={handleTestTelegram}
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-500 hover:bg-blue-600 text-white text-xs font-semibold shadow-lg shadow-blue-500/20 transition-all active:scale-95 disabled:opacity-50"
+              >
+                {telegramTesting ? (
+                  <>
+                    <Loader2 size={14} className="animate-spin" />
+                    <span>Sending Test Ping...</span>
+                  </>
+                ) : (
+                  <>
+                    <Send size={14} />
+                    <span>Send Test Notification to Phone</span>
+                  </>
+                )}
+              </button>
+
+              {telegramTestStatus !== 'idle' && (
+                <div
+                  className={`text-xs px-3.5 py-2 rounded-xl border flex items-center gap-2 ${
+                    telegramTestStatus === 'success'
+                      ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400'
+                      : 'bg-red-500/10 border-red-500/20 text-red-400'
+                  }`}
+                >
+                  {telegramTestStatus === 'success' ? <CheckCircle2 size={14} /> : <AlertCircle size={14} />}
+                  <span>{telegramTestMessage}</span>
+                </div>
+              )}
+            </div>
+
+            {/* Quick Setup Instructions Pill */}
+            <div className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.06] space-y-2 text-xs text-white/60">
+              <p className="font-semibold text-white/80 flex items-center gap-1.5">
+                <HelpCircle size={14} className="text-blue-400" />
+                <span>টেলিগ্রাম বট সেটআপ করার সহজ ৩ ধাপ (30 Seconds Setup Guide):</span>
+              </p>
+              <ol className="list-decimal list-inside space-y-1 text-white/50 pl-1 leading-relaxed">
+                <li>টেলিগ্রামে <b>@BotFather</b> লিখে সার্চ করুন এবং <code>/newbot</code> পাঠিয়ে আপনার বটের নাম দিয়ে <b>API Token</b> টি কপি করে এখানে বসান।</li>
+                <li>আপনার নিজের Chat ID জানতে টেলিগ্রামে <b>@userinfobot</b> বা <b>@raw_data_bot</b> এ একটি মেসেজ দিলে আপনার <b>ID</b> পেয়ে যাবেন।</li>
+                <li>নতুন বটের চ্যাটে গিয়ে <b>&quot;Start&quot;</b> বাটনে চাপ দিন, তারপর উপরের <b>&quot;Send Test Notification&quot;</b> বাটনে ক্লিক করে চেক করুন।</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+
         {/* 4. Bio Story & Personal Motto */}
         <div className="glass gradient-border rounded-2xl p-6 space-y-4">
           <h2 className="text-white font-semibold text-base flex items-center gap-2">
@@ -964,6 +1290,129 @@ export default function AdminSettingsPage() {
           )}
         </button>
       </form>
+
+      {/* 6. IN-ADMIN PASSWORD CHANGE & SECURITY */}
+      <div className="glass gradient-border rounded-2xl p-6 space-y-5 border-emerald-500/30 bg-emerald-500/[0.02]">
+        <div className="flex items-start gap-3 border-b border-white/[0.08] pb-4">
+          <div className="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center flex-shrink-0">
+            <KeyRound size={20} />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <h2 className="text-white font-bold text-lg">Admin Password &amp; Security Settings</h2>
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-semibold">
+                SUPABASE SYNCED
+              </span>
+            </div>
+            <p className="text-white/40 text-xs mt-0.5">
+              Change your admin password directly from here. No need to open the Supabase dashboard—it automatically updates Supabase Auth and all connected devices.
+            </p>
+          </div>
+        </div>
+
+        <form onSubmit={handleChangePassword} className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-white/60 text-xs font-medium uppercase tracking-wider">
+                  Current Password
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setShowCurrentPass(!showCurrentPass)}
+                  className="text-white/40 hover:text-white text-[11px] inline-flex items-center gap-1"
+                >
+                  {showCurrentPass ? <EyeOff size={12} /> : <Eye size={12} />}
+                </button>
+              </div>
+              <input
+                type={showCurrentPass ? 'text' : 'password'}
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                className={inputClass}
+                placeholder="Default: admin123"
+              />
+            </div>
+
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-white/60 text-xs font-medium uppercase tracking-wider">
+                  New Password
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setShowNewPass(!showNewPass)}
+                  className="text-white/40 hover:text-white text-[11px] inline-flex items-center gap-1"
+                >
+                  {showNewPass ? <EyeOff size={12} /> : <Eye size={12} />}
+                </button>
+              </div>
+              <input
+                type={showNewPass ? 'text' : 'password'}
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                className={inputClass}
+                placeholder="Min 6 characters"
+              />
+            </div>
+
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-white/60 text-xs font-medium uppercase tracking-wider">
+                  Confirm Password
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPass(!showConfirmPass)}
+                  className="text-white/40 hover:text-white text-[11px] inline-flex items-center gap-1"
+                >
+                  {showConfirmPass ? <EyeOff size={12} /> : <Eye size={12} />}
+                </button>
+              </div>
+              <input
+                type={showConfirmPass ? 'text' : 'password'}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className={inputClass}
+                placeholder="Re-type new password"
+              />
+            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-2">
+            <button
+              type="submit"
+              disabled={passwordChanging}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-semibold shadow-lg shadow-emerald-500/20 transition-all active:scale-95 disabled:opacity-50"
+            >
+              {passwordChanging ? (
+                <>
+                  <Loader2 size={14} className="animate-spin" />
+                  <span>Updating Password...</span>
+                </>
+              ) : (
+                <>
+                  <ShieldCheck size={14} />
+                  <span>Update Admin Password</span>
+                </>
+              )}
+            </button>
+
+            {passwordStatus !== 'idle' && (
+              <div
+                className={`text-xs px-3.5 py-2 rounded-xl border flex items-center gap-2 ${
+                  passwordStatus === 'success'
+                    ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400'
+                    : 'bg-red-500/10 border-red-500/20 text-red-400'
+                }`}
+              >
+                {passwordStatus === 'success' ? <CheckCircle2 size={14} /> : <AlertCircle size={14} />}
+                <span>{passwordMessage}</span>
+              </div>
+            )}
+          </div>
+        </form>
+      </div>
     </div>
   )
 }

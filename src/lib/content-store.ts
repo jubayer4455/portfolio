@@ -49,6 +49,21 @@ export interface SiteSettingsData {
   socials_subtitle?: string
   about_title?: string
   reviews_title?: string
+
+  // Telegram Notifications
+  telegram_notifications_enabled?: boolean
+  telegram_bot_token?: string
+  telegram_chat_id?: string
+
+  // Maintenance Mode
+  maintenance_mode_enabled?: boolean
+  maintenance_title?: string
+  maintenance_message?: string
+
+  // Admin Security & Password
+  admin_password_hash?: string
+  admin_password_salt?: string
+  admin_password_updated_at?: string
 }
 
 export interface SocialProfileData {
@@ -197,16 +212,27 @@ export async function getSiteSettings(): Promise<SiteSettingsData> {
       if (data && data.length > 0) {
         const fileContent = readContentFile()
         const merged: Record<string, unknown> = { ...fileContent.settings }
+        const forceStringKeys = [
+          'whatsapp_number',
+          'telegram_chat_id',
+          'telegram_bot_token',
+          'admin_password_hash',
+          'admin_password_salt',
+          'admin_password_updated_at',
+          'maintenance_title',
+          'maintenance_message',
+        ]
         data.forEach((row: { key: string; value: string }) => {
           if (!row.key.endsWith('_json')) {
-            merged[row.key] =
-              row.value === 'true'
-                ? true
-                : row.value === 'false'
-                ? false
-                : isNaN(Number(row.value)) || row.key === 'whatsapp_number' || typeof row.value !== 'string'
-                ? row.value
-                : Number(row.value)
+            if (row.value === 'true') {
+              merged[row.key] = true
+            } else if (row.value === 'false') {
+              merged[row.key] = false
+            } else if (forceStringKeys.includes(row.key) || isNaN(Number(row.value)) || typeof row.value !== 'string') {
+              merged[row.key] = row.value
+            } else {
+              merged[row.key] = Number(row.value)
+            }
           }
         })
         return merged as unknown as SiteSettingsData

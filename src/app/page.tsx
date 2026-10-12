@@ -13,6 +13,10 @@ import BuilderFeatureBanner from '@/components/builder/BuilderFeatureBanner'
 import FeaturedCreatorsSection from '@/components/home/FeaturedCreatorsSection'
 import FaqSection from '@/components/home/FaqSection'
 import WebProjectsShowcase from '@/components/projects/WebProjectsShowcase'
+import { cookies } from 'next/headers'
+import Link from 'next/link'
+import { AlertTriangle } from 'lucide-react'
+import MaintenanceScreen from '@/components/common/MaintenanceScreen'
 import { getSiteSettings, getSocialProfiles, getGalleryItems } from '@/lib/content-store'
 import { getApprovedReviews, getAllUserBios } from '@/lib/builder-store'
 import { getFeaturedProjects } from '@/lib/projects-store'
@@ -32,8 +36,38 @@ export default async function HomePage() {
 
   const featuredUsers = allBios.filter((b) => b.is_featured || b.username === 'sarah')
 
+  const cookieStore = cookies()
+  const isDemoAdmin = cookieStore.get('demo_admin')?.value === 'true'
+  const sessionUser = cookieStore.get('user_session_username')?.value
+  const sessionEmail = cookieStore.get('user_session_email')?.value
+  const isAdmin =
+    isDemoAdmin ||
+    sessionUser === 'admin' ||
+    sessionUser === 'jubayer' ||
+    sessionEmail === 'admin@portfolio.com' ||
+    sessionEmail === 'jubayerahmmed2k@gmail.com'
+
+  // If maintenance mode is active and user is NOT admin, show maintenance screen
+  if (settings.maintenance_mode_enabled && !isAdmin) {
+    return <MaintenanceScreen settings={settings} />
+  }
+
   return (
     <>
+      {settings.maintenance_mode_enabled && isAdmin && (
+        <div className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-500 text-black px-4 py-2 text-xs font-bold flex items-center justify-between shadow-2xl backdrop-blur-md">
+          <div className="flex items-center gap-2">
+            <AlertTriangle size={15} className="animate-pulse" />
+            <span>⚠️ Maintenance Mode Active: Public visitors see Coming Soon screen. You are previewing as Admin.</span>
+          </div>
+          <Link
+            href="/admin/settings"
+            className="px-2.5 py-1 rounded bg-black/20 hover:bg-black/30 text-black text-[11px] font-extrabold uppercase tracking-wider transition-all"
+          >
+            Manage in Settings ↗
+          </Link>
+        </div>
+      )}
       <a href="#main-content" className="skip-link">
         Skip to main content
       </a>

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { createClient as createServiceClient } from '@supabase/supabase-js'
 import { authenticateUser } from '@/lib/user-auth'
+import { verifyAdminPassword } from '@/lib/admin-auth'
 
 export const dynamic = 'force-dynamic'
 
@@ -32,15 +33,15 @@ export async function POST(req: NextRequest) {
     const cookieStore = await cookies()
 
     // 1. Check Master Admin Credentials
-    if (
-      (identifier === 'admin@portfolio.com' || identifier === 'admin') &&
-      password === 'admin123'
-    ) {
-      cookieStore.set('demo_admin', 'true', { path: '/', maxAge: 60 * 60 * 24 * 7 })
-      return NextResponse.json({
-        success: true,
-        redirect: '/admin',
-      })
+    if (identifier === 'admin@portfolio.com' || identifier === 'admin') {
+      const isValidAdmin = await verifyAdminPassword(password)
+      if (isValidAdmin) {
+        cookieStore.set('demo_admin', 'true', { path: '/', maxAge: 60 * 60 * 24 * 7 })
+        return NextResponse.json({
+          success: true,
+          redirect: '/admin',
+        })
+      }
     }
 
     // 2. Local Account Authentication (Primary & Instant)

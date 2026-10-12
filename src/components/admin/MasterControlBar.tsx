@@ -17,6 +17,8 @@ import {
   ShieldCheck,
   Check,
   AlertCircle,
+  AlertTriangle,
+  BellRing,
   Eye,
   EyeOff,
 } from 'lucide-react'
@@ -205,6 +207,28 @@ export default function MasterControlBar({
       {/* Live Site Section Visibility Status Strip */}
       <div className="pt-3 border-t border-white/[0.06] flex flex-wrap items-center gap-2 text-xs">
         <span className="text-white/40 text-[11px] font-medium mr-1">Live Status:</span>
+
+        <span
+          className={`px-2.5 py-1 rounded-lg border text-[11px] font-medium flex items-center gap-1.5 ${
+            settings.maintenance_mode_enabled
+              ? 'bg-amber-500/20 border-amber-500/40 text-amber-400 font-bold'
+              : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
+          }`}
+        >
+          <AlertTriangle size={11} className={settings.maintenance_mode_enabled ? 'animate-pulse' : ''} />
+          {settings.maintenance_mode_enabled ? 'Maintenance Mode • Active' : 'Public Site • Live'}
+        </span>
+
+        <span
+          className={`px-2.5 py-1 rounded-lg border text-[11px] font-medium flex items-center gap-1.5 ${
+            settings.telegram_notifications_enabled
+              ? 'bg-blue-500/15 border-blue-500/30 text-blue-400'
+              : 'bg-white/5 border-white/10 text-white/40'
+          }`}
+        >
+          <BellRing size={11} />
+          Telegram Alerts {settings.telegram_notifications_enabled ? '• Enabled' : '• Off'}
+        </span>
 
         <span
           className={`px-2.5 py-1 rounded-lg border text-[11px] font-medium flex items-center gap-1.5 ${

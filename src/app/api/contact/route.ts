@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 import fs from 'fs'
 import path from 'path'
 import os from 'os'
+import { sendContactTelegramAlert } from '@/lib/telegram'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -177,6 +178,15 @@ export async function POST(req: NextRequest) {
 
   // Save locally
   saveSubmissionLocally(newSubmission)
+
+  // Dispatch Telegram alert asynchronously without blocking client
+  sendContactTelegramAlert({
+    name: newSubmission.name,
+    email: newSubmission.email,
+    subject: newSubmission.subject,
+    message: newSubmission.message,
+    ip: newSubmission.ip_address,
+  }).catch((err) => console.warn('Telegram contact notification failed:', err))
 
   return NextResponse.json({
     success: true,
