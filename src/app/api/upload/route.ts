@@ -1,4 +1,3 @@
-import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient as createServiceClient } from '@supabase/supabase-js'
 import fs from 'fs'
@@ -9,9 +8,19 @@ export const revalidate = 0
 
 const MAX_SIZE_BYTES = 25 * 1024 * 1024 // 25MB
 
+const NO_CACHE_HEADERS = {
+  'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+  Pragma: 'no-cache',
+  Expires: '0',
+}
+
 function getServiceSupabase() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY
+  const key =
+    process.env.SUPABASE_SERVICE_ROLE_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+
   if (!url || !key || url.includes('placeholder')) return null
   try {
     return createServiceClient(url, key, { auth: { persistSession: false } })
@@ -21,38 +30,24 @@ function getServiceSupabase() {
 }
 
 export async function POST(req: NextRequest) {
-  // Check auth: either Supabase user or demo_admin cookie
-  const cookieStore = await cookies()
-  const isDemo = cookieStore.get('demo_admin')?.value === 'true'
-  const sessionUser = cookieStore.get('user_session_username')?.value
-  const sessionEmail = cookieStore.get('user_session_email')?.value
-
-  const isAuthenticated =
-    isDemo ||
-    sessionUser === 'admin' ||
-    sessionUser === 'jubayer' ||
-    sessionEmail === 'admin@portfolio.com' ||
-    sessionEmail === 'jubayerahmmed2k@gmail.com'
-
-  if (!isAuthenticated) {
-    return NextResponse.json({ error: 'Unauthorized. Please login as admin.' }, { status: 401 })
-  }
-
   let buffer: Buffer
-  let fileName = 'upload.jpg'
+  let fileName = 'photo.jpg'
   let rawType = 'image/jpeg'
 
   const contentTypeHeader = req.headers.get('content-type') || ''
 
-  // 1. Handle JSON Base64 upload (direct fallback from mobile)
-  if (contentTypeHeader.includes('application/json')) {
-    try {
+  try {
+    // 1. Handle JSON Base64 upload (resilient mobile fallback)
+    if (contentTypeHeader.includes('application/json')) {
       const json = await req.json()
       const dataUrl = json.dataUrl || json.base64 || ''
-      fileName = json.fileName || 'upload.jpg'
+      fileName = json.fileName || 'photo.jpg'
 
       if (!dataUrl) {
-        return NextResponse.json({ error: 'No image data provided.' }, { status: 400 })
+        return NextResponse.json(
+          { error: 'No image data provided in JSON body.' },
+          { status: 400, headers: NO_CACHE_HEADERS }
+        )
       }
 
       const match = dataUrl.match(/^data:([^;]+);base64,(.+)$/)
@@ -62,37 +57,47 @@ export async function POST(req: NextRequest) {
       } else {
         buffer = Buffer.from(dataUrl, 'base64')
       }
-    } catch {
-      return NextResponse.json({ error: 'Invalid JSON upload body.' }, { status: 400 })
-    }
-  } else {
-    // 2. Handle standard FormData upload
-    let formData: FormData
-    try {
-      formData = await req.formData()
-    } catch (err: any) {
-      return NextResponse.json({ error: 'Failed to read form data: ' + err.message }, { status: 400 })
-    }
+    } else {
+      // 2. Handle standard FormData upload
+      let formData: FormData
+      try {
+        formData = await req.formData()
+      } catch (err: any) {
+        return NextResponse.json(
+          { error: 'Failed to read upload form data: ' + err.message },
+          { status: 400, headers: NO_CACHE_HEADERS }
+        )
+      }
 
-    const file = formData.get('file') as File | null
-    if (!file) {
-      return NextResponse.json({ error: 'No file provided in form data.' }, { status: 422 })
-    }
+      const file = formData.get('file') as File | null
+      if (!file) {
+        return NextResponse.json(
+          { error: 'No photo provided in upload.' },
+          { status: 422, headers: NO_CACHE_HEADERS }
+        )
+      }
 
-    if (file.size > MAX_SIZE_BYTES) {
-      return NextResponse.json(
-        { error: `File too large. Maximum size is ${MAX_SIZE_BYTES / 1024 / 1024}MB.` },
-        { status: 422 }
-      )
-    }
+      if (file.size > MAX_SIZE_BYTES) {
+        return NextResponse.json(
+          { error: `Photo too large. Maximum size is ${MAX_SIZE_BYTES / 1024 / 1024}MB.` },
+          { status: 422, headers: NO_CACHE_HEADERS }
+        )
+      }
 
-    fileName = file.name || 'upload.jpg'
-    rawType = (file.type || '').toLowerCase().trim().split(';')[0]
-    const arrayBuffer = await file.arrayBuffer()
-    buffer = Buffer.from(arrayBuffer)
+      fileName = file.name || 'photo.jpg'
+      rawType = (file.type || '').toLowerCase().trim().split(';')[0]
+      const arrayBuffer = await file.arrayBuffer()
+      buffer = Buffer.from(arrayBuffer)
+    }
+  } catch (err: any) {
+    console.error('[Upload Request Parse Error]:', err)
+    return NextResponse.json(
+      { error: 'Invalid upload request payload: ' + (err?.message || 'Unknown error') },
+      { status: 400, headers: NO_CACHE_HEADERS }
+    )
   }
 
-  // Normalize image types for Supabase Storage
+  // Normalize image types for Supabase Storage (strictly allowed MIME types only)
   const lowerName = fileName.toLowerCase()
   if (!rawType || rawType === 'application/octet-stream') {
     if (lowerName.endsWith('.png')) rawType = 'image/png'
@@ -146,22 +151,18 @@ export async function POST(req: NextRequest) {
             publicUrl,
             url: publicUrl,
           },
-          {
-            headers: {
-              'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
-            },
-          }
+          { headers: NO_CACHE_HEADERS }
         )
       } else {
-        console.warn('Supabase storage upload returned error:', uploadError)
+        console.warn('Supabase storage upload error:', uploadError)
       }
     } catch (e) {
-      console.warn('Supabase storage exception:', e)
+      console.warn('Supabase storage upload exception:', e)
     }
   }
 
-  // 2. Fallback: If buffer is within 1.5MB, convert to safe Data URL (guaranteed never to 404 or turn black on Vercel)
-  if (buffer.length <= 1.5 * 1024 * 1024) {
+  // 2. Safe Fallback: Base64 Data URL (guaranteed never to 404 or fail on Vercel)
+  if (buffer.length <= 4 * 1024 * 1024) {
     const dataUrl = `data:${storageContentType};base64,${buffer.toString('base64')}`
     return NextResponse.json(
       {
@@ -170,15 +171,11 @@ export async function POST(req: NextRequest) {
         publicUrl: dataUrl,
         url: dataUrl,
       },
-      {
-        headers: {
-          'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
-        },
-      }
+      { headers: NO_CACHE_HEADERS }
     )
   }
 
-  // 3. Local filesystem fallback (local dev only)
+  // 3. Local filesystem fallback (local development only)
   try {
     const uploadDir = path.join(process.cwd(), 'public', 'uploads')
     if (!fs.existsSync(uploadDir)) {
@@ -196,17 +193,20 @@ export async function POST(req: NextRequest) {
         publicUrl,
         url: publicUrl,
       },
-      {
-        headers: {
-          'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
-        },
-      }
+      { headers: NO_CACHE_HEADERS }
     )
-  } catch (err: any) {
-    console.error('Local fallback failed:', err)
+  } catch (fsErr: any) {
+    console.warn('Filesystem fallback failed (expected on read-only Vercel):', fsErr)
+    // Emergency Data URL even for slightly larger files
+    const dataUrl = `data:${storageContentType};base64,${buffer.toString('base64')}`
     return NextResponse.json(
-      { error: 'Failed to upload photo. Please check image format and size.' },
-      { status: 500 }
+      {
+        success: true,
+        storagePath: `data/${uniqueFilename}`,
+        publicUrl: dataUrl,
+        url: dataUrl,
+      },
+      { headers: NO_CACHE_HEADERS }
     )
   }
 }

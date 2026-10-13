@@ -18,7 +18,7 @@ import {
   Image as ImageIcon,
 } from 'lucide-react'
 import type { GalleryImageData } from '@/lib/content-store'
-import { processAndCompressImage, formatBytes } from '@/lib/image-compress'
+import { processAndCompressImage, uploadImageFile, formatBytes } from '@/lib/image-compress'
 
 interface UploadForm {
   file: File | null
@@ -137,9 +137,9 @@ export default function AdminGalleryPage() {
 
     try {
       // Automatic client-side optimization:
-      // Downscales large mobile camera photos, prevents memory exhaustion,
-      // and converts to web-ready JPEG so it never turns black or fails.
-      const result = await processAndCompressImage(rawFile, 2048, 0.86)
+      // Downscales large mobile camera photos (max 1600px), prevents memory exhaustion,
+      // and converts to web-ready JPEG so it never turns black or fails on any network.
+      const result = await processAndCompressImage(rawFile, 1600, 0.82)
 
       setUploadForm((prev) => ({
         ...prev,
@@ -187,21 +187,15 @@ export default function AdminGalleryPage() {
     setUploadStatus('idle')
 
     try {
-      // 1. Upload the compressed image file
-      const formData = new FormData()
-      formData.append('file', uploadForm.file)
-
-      const uploadRes = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
+      // 1. Upload the optimized photo via universal resilient uploader
+      const uploaded = await uploadImageFile(uploadForm.file, {
+        maxDimension: 1600,
+        quality: 0.82,
+        fileName: uploadForm.file.name,
       })
 
-      const uploadData = await uploadRes.json()
-
-      if (!uploadRes.ok || !uploadData.publicUrl) {
-        setUploadStatus('error')
-        setUploadMessage(uploadData?.error || 'Upload failed. Please try another image.')
-        return
+      if (!uploaded.publicUrl) {
+        throw new Error('Upload could not generate a valid image URL. Please try again.')
       }
 
       // 2. Create the gallery record
@@ -213,21 +207,39 @@ export default function AdminGalleryPage() {
           category: uploadForm.category || 'Portraits',
           description: uploadForm.description.trim(),
           alt_text: uploadForm.alt_text.trim() || uploadForm.title.trim(),
-          public_url: uploadData.publicUrl,
-          width: imageDimensions.width || 800,
-          height: imageDimensions.height || 600,
+          public_url: uploaded.publicUrl,
+          width: uploaded.width || imageDimensions.width || 800,
+          height: uploaded.height || imageDimensions.height || 600,
           is_public: uploadForm.is_public,
         }),
       })
 
-      const data = await res.json()
-      if (!res.ok) {
-        setUploadStatus('error')
-        setUploadMessage(data.error || 'Failed to save gallery record.')
-        return
+      let data: any = null
+      try {
+        data = await res.json()
+      } catch {
+        const rawText = await res.text().catch(() => '')
+        throw new Error(rawText || `Server responded with status ${res.status}`)
       }
 
-      setImages((prev) => [data.data, ...prev])
+      if (!res.ok || (!data?.data && !data?.success)) {
+        throw new Error(data?.error || 'Failed to save gallery record.')
+      }
+
+      const newRecord = data.data || {
+        id: String(Date.now()),
+        title: uploadForm.title.trim(),
+        category: uploadForm.category || 'Portraits',
+        description: uploadForm.description.trim(),
+        alt_text: uploadForm.alt_text.trim() || uploadForm.title.trim(),
+        public_url: uploaded.publicUrl,
+        width: uploaded.width || 800,
+        height: uploaded.height || 600,
+        is_public: uploadForm.is_public,
+        slug: 'photo-' + Date.now(),
+      }
+
+      setImages((prev) => [newRecord, ...prev])
       setUploadForm({
         file: null,
         title: '',
@@ -241,9 +253,10 @@ export default function AdminGalleryPage() {
       if (fileInputRef.current) fileInputRef.current.value = ''
       setUploadStatus('success')
       setUploadMessage('Photo uploaded and published live to Visual Diary!')
-    } catch {
+    } catch (err: any) {
+      console.error('Gallery upload error:', err)
       setUploadStatus('error')
-      setUploadMessage('An unexpected network error occurred during upload. Please try again.')
+      setUploadMessage(err?.message || 'Upload could not be completed. Please try again.')
     } finally {
       setUploading(false)
     }

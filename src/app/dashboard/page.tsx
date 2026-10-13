@@ -44,6 +44,7 @@ import {
 import PlatformIcon from '@/components/common/PlatformIcon'
 import BioInstagramStoryModal from '@/components/bio/BioInstagramStoryModal'
 import type { UserBioData, UserSecretMessage } from '@/lib/builder-store'
+import { uploadImageFile } from '@/lib/image-compress'
 
 const AVAILABLE_PLATFORMS = [
   'Instagram',
@@ -251,22 +252,20 @@ export default function UserDashboard() {
     setUploadingAvatar(true)
     setError('')
     try {
-      const formData = new FormData()
-      formData.append('file', file)
-
-      const res = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
+      const uploaded = await uploadImageFile(file, {
+        maxDimension: 1000,
+        quality: 0.85,
+        fileName: file.name || 'avatar.jpg',
       })
-      const data = await res.json()
 
-      if (res.ok && data.publicUrl) {
-        setBioData((prev) => ({ ...prev, avatar_url: data.publicUrl }))
+      if (uploaded.publicUrl) {
+        setBioData((prev) => ({ ...prev, avatar_url: uploaded.publicUrl }))
       } else {
-        setError(data.error || 'Failed to upload avatar.')
+        throw new Error('Could not upload avatar photo.')
       }
-    } catch {
-      setError('Upload error. Check network or file size.')
+    } catch (err: any) {
+      console.error('Avatar upload error:', err)
+      setError(err?.message || 'Failed to upload avatar. Please try again.')
     } finally {
       setUploadingAvatar(false)
     }
@@ -279,22 +278,20 @@ export default function UserDashboard() {
     setUploadingCover(true)
     setError('')
     try {
-      const formData = new FormData()
-      formData.append('file', file)
-
-      const res = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
+      const uploaded = await uploadImageFile(file, {
+        maxDimension: 1600,
+        quality: 0.82,
+        fileName: file.name || 'cover.jpg',
       })
-      const data = await res.json()
 
-      if (res.ok && data.publicUrl) {
-        setBioData((prev) => ({ ...prev, cover_url: data.publicUrl }))
+      if (uploaded.publicUrl) {
+        setBioData((prev) => ({ ...prev, cover_url: uploaded.publicUrl }))
       } else {
-        setError(data.error || 'Failed to upload cover banner.')
+        throw new Error('Could not upload cover banner.')
       }
-    } catch {
-      setError('Cover upload error. Max 10MB.')
+    } catch (err: any) {
+      console.error('Cover upload error:', err)
+      setError(err?.message || 'Failed to upload cover banner. Please try again.')
     } finally {
       setUploadingCover(false)
     }
@@ -307,31 +304,29 @@ export default function UserDashboard() {
     setUploadingSlot(slotIndex)
     setError('')
     try {
-      const formData = new FormData()
-      formData.append('file', file)
-
-      const res = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
+      const uploaded = await uploadImageFile(file, {
+        maxDimension: 1400,
+        quality: 0.82,
+        fileName: file.name || `photo-${slotIndex + 1}.jpg`,
       })
-      const data = await res.json()
 
-      if (res.ok && data.publicUrl) {
+      if (uploaded.publicUrl) {
         setBioData((prev) => {
           const newPhotos = [...(prev.photos || [])]
           const newPhotoItem = {
             id: `pic-${Date.now()}-${slotIndex}`,
-            url: data.publicUrl,
+            url: uploaded.publicUrl,
             caption: newPhotos[slotIndex]?.caption || `Photo ${slotIndex + 1}`,
           }
           newPhotos[slotIndex] = newPhotoItem
           return { ...prev, photos: newPhotos.slice(0, 4) }
         })
       } else {
-        setError(data.error || 'Failed to upload photo.')
+        throw new Error('Could not upload photo.')
       }
-    } catch {
-      setError('Upload error. Max 10MB JPG/PNG/WEBP.')
+    } catch (err: any) {
+      console.error('Photo upload error:', err)
+      setError(err?.message || 'Failed to upload photo. Please try again.')
     } finally {
       setUploadingSlot(null)
     }

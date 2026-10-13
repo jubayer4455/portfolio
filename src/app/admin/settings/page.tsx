@@ -39,7 +39,7 @@ import {
   Check,
 } from 'lucide-react'
 import type { SiteSettingsData } from '@/lib/content-store'
-import { processAndCompressImage } from '@/lib/image-compress'
+import { processAndCompressImage, uploadImageFile } from '@/lib/image-compress'
 
 const defaultSettings: SiteSettingsData = {
   site_name: 'Abdul Al Jubayer',
@@ -163,23 +163,18 @@ export default function AdminSettingsPage() {
     setStatus('idle')
 
     try {
-      const processed = await processAndCompressImage(file, 1200, 0.88)
-      const formData = new FormData()
-      formData.append('file', processed.file)
-
-      const res = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
+      const uploaded = await uploadImageFile(file, {
+        maxDimension: 1200,
+        quality: 0.85,
+        fileName: file.name || 'avatar.jpg',
       })
 
-      const data = await res.json()
-      if (res.ok && (data.publicUrl || data.url)) {
-        const uploadedUrl = data.publicUrl || data.url
-        handleChange('avatar_url', uploadedUrl)
+      if (uploaded.publicUrl) {
+        handleChange('avatar_url', uploaded.publicUrl)
         setStatus('success')
         setMessage('Photo uploaded! Click "Save Changes" at the bottom to apply to live site.')
       } else {
-        throw new Error(data.error || 'Upload failed')
+        throw new Error('Upload failed')
       }
     } catch (err: any) {
       console.error('Avatar upload failed:', err)

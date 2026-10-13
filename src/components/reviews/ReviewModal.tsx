@@ -14,6 +14,7 @@ import {
   AlertCircle
 } from 'lucide-react'
 import Image from 'next/image'
+import { uploadImageFile } from '@/lib/image-compress'
 
 interface ReviewModalProps {
   isOpen: boolean
@@ -41,22 +42,20 @@ export default function ReviewModal({ isOpen, onClose, onSuccess }: ReviewModalP
     setUploadingPhoto(true)
     setError('')
     try {
-      const formData = new FormData()
-      formData.append('file', file)
-
-      const res = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
+      const uploaded = await uploadImageFile(file, {
+        maxDimension: 800,
+        quality: 0.85,
+        fileName: file.name || 'reviewer.jpg',
       })
-      const data = await res.json()
 
-      if (res.ok && data.publicUrl) {
-        setUserPhoto(data.publicUrl)
+      if (uploaded.publicUrl) {
+        setUserPhoto(uploaded.publicUrl)
       } else {
-        setError(data.error || 'Failed to upload image.')
+        throw new Error('Failed to upload image.')
       }
-    } catch {
-      setError('Upload failed. Try entering an image URL instead.')
+    } catch (err: any) {
+      console.error('Reviewer photo upload error:', err)
+      setError(err?.message || 'Upload failed. Try entering an image URL instead.')
     } finally {
       setUploadingPhoto(false)
     }

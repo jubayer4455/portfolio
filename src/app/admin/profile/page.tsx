@@ -19,6 +19,7 @@ import {
   EyeOff,
 } from 'lucide-react'
 import type { SiteSettingsData } from '@/lib/content-store'
+import { uploadImageFile } from '@/lib/image-compress'
 
 export default function AdminProfilePage() {
   const [loading, setLoading] = useState(true)
@@ -95,39 +96,23 @@ export default function AdminProfilePage() {
     setStatus('idle')
 
     try {
-      const formData = new FormData()
-      formData.append('file', file)
-
-      const res = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
+      const uploaded = await uploadImageFile(file, {
+        maxDimension: 1200,
+        quality: 0.85,
+        fileName: file.name || 'avatar.jpg',
       })
-      const data = await res.json()
 
-      const uploadedUrl = data.publicUrl || data.url
-      if (res.ok && uploadedUrl) {
-        setAvatarUrl(uploadedUrl)
+      if (uploaded.publicUrl) {
+        setAvatarUrl(uploaded.publicUrl)
         setStatus('success')
         setStatusMessage('Avatar photo uploaded successfully! Click "Save Changes" to apply.')
       } else {
-        // Fallback to FileReader DataURL
-        const reader = new FileReader()
-        reader.onloadend = () => {
-          if (typeof reader.result === 'string') {
-            setAvatarUrl(reader.result)
-          }
-        }
-        reader.readAsDataURL(file)
+        throw new Error('Could not upload avatar.')
       }
-    } catch {
-      // Local fallback
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        if (typeof reader.result === 'string') {
-          setAvatarUrl(reader.result)
-        }
-      }
-      reader.readAsDataURL(file)
+    } catch (err: any) {
+      console.error('Avatar upload error:', err)
+      setStatus('error')
+      setStatusMessage(err?.message || 'Failed to upload avatar photo.')
     } finally {
       setUploadingAvatar(false)
     }
