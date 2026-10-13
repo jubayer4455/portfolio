@@ -39,6 +39,7 @@ import {
   Check,
 } from 'lucide-react'
 import type { SiteSettingsData } from '@/lib/content-store'
+import { processAndCompressImage } from '@/lib/image-compress'
 
 const defaultSettings: SiteSettingsData = {
   site_name: 'Abdul Al Jubayer',
@@ -162,8 +163,9 @@ export default function AdminSettingsPage() {
     setStatus('idle')
 
     try {
+      const processed = await processAndCompressImage(file, 1200, 0.88)
       const formData = new FormData()
-      formData.append('file', file)
+      formData.append('file', processed.file)
 
       const res = await fetch('/api/upload', {
         method: 'POST',

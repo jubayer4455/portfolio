@@ -188,7 +188,6 @@ function LikeButton({
   )
 }
 
-// ── Tilt card ────────────────────────────────────────────────────────────────
 function GalleryCard({
   item,
   onClick,
@@ -197,6 +196,8 @@ function GalleryCard({
   onClick: (item: GalleryItem) => void
 }) {
   const cardRef = useRef<HTMLDivElement>(null)
+  const [imgError, setImgError] = useState(false)
+  const [imgLoaded, setImgLoaded] = useState(false)
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (typeof window !== 'undefined' && window.matchMedia('(hover: none)').matches) return
@@ -228,18 +229,34 @@ function GalleryCard({
       onKeyDown={(e) => e.key === 'Enter' && onClick(item)}
     >
       <div
-        className="relative w-full overflow-hidden"
+        className="relative w-full overflow-hidden bg-neutral-900"
         style={{ paddingBottom: `${((item.height || 600) / (item.width || 800)) * 100}%` }}
       >
-        <Image
-          src={item.src}
-          alt={item.title}
-          fill
-          unoptimized
-          loading="lazy"
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-          className="object-cover transition-transform duration-700 group-hover:scale-105"
-        />
+        {!imgLoaded && !imgError && (
+          <div className="absolute inset-0 bg-white/[0.04] animate-pulse" />
+        )}
+
+        {imgError ? (
+          <div className="absolute inset-0 bg-neutral-950 flex flex-col items-center justify-center p-4 text-center">
+            <Camera size={26} className="text-orange-400 mb-2 opacity-60" />
+            <p className="text-white font-medium text-xs line-clamp-1">{item.title}</p>
+            <span className="text-[10px] text-white/40 mt-1">{item.category}</span>
+          </div>
+        ) : (
+          <Image
+            src={item.src}
+            alt={item.title}
+            fill
+            unoptimized
+            loading="lazy"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            onLoad={() => setImgLoaded(true)}
+            onError={() => setImgError(true)}
+            className={`object-cover transition-all duration-700 group-hover:scale-105 ${
+              imgLoaded ? 'opacity-100' : 'opacity-0'
+            }`}
+          />
+        )}
 
         {/* Floating Like Badge on Top-Right */}
         <div className="absolute top-3 right-3 z-10">
@@ -283,6 +300,11 @@ function Lightbox({
   onNext: () => void
 }) {
   const currentIndex = items.findIndex((i) => i.id === item.id)
+  const [imgError, setImgError] = useState(false)
+
+  useEffect(() => {
+    setImgError(false)
+  }, [item.id])
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -314,15 +336,24 @@ function Lightbox({
         className="relative max-w-4xl max-h-[92vh] w-full glass rounded-3xl overflow-hidden border border-white/10 shadow-2xl flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="relative flex-1 min-h-[300px] sm:min-h-[480px] bg-black/40">
-          <Image
-            src={item.src}
-            alt={item.title}
-            fill
-            unoptimized
-            className="object-contain"
-            priority
-          />
+        <div className="relative flex-1 min-h-[300px] sm:min-h-[480px] bg-black/60 flex items-center justify-center">
+          {imgError ? (
+            <div className="flex flex-col items-center justify-center p-8 text-center text-white/50">
+              <Camera size={36} className="text-orange-400 mb-2 opacity-60" />
+              <p className="text-white text-sm font-semibold">{item.title}</p>
+              <p className="text-xs text-white/40 mt-1">Image preview not available</p>
+            </div>
+          ) : (
+            <Image
+              src={item.src}
+              alt={item.title}
+              fill
+              unoptimized
+              className="object-contain"
+              priority
+              onError={() => setImgError(true)}
+            />
+          )}
         </div>
         <div className="p-5 sm:p-6 border-t border-white/10 bg-neutral-950/70 flex items-center justify-between gap-4">
           <div>
