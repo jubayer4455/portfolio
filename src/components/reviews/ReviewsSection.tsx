@@ -115,7 +115,8 @@ export default function ReviewsSection({ initialReviews = [] }: ReviewsSectionPr
                       {rev.user_photo ? (
                         <Image
                           src={rev.user_photo}
-                          alt={rev.user_name}
+                          alt={`${rev.user_name} — Verified Client Reviewer Portrait`}
+                          title={`${rev.user_name} Reviewer Portrait`}
                           fill
                           loading="lazy"
                           sizes="40px"

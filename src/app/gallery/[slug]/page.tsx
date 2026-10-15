@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/server'
 import { ArrowLeft, Share2 } from 'lucide-react'
 import type { GalleryImage } from '@/types'
 import ShareBar from '@/components/gallery/ShareBar'
+import { generateImageObjectSchema } from '@/lib/seo-engine'
 
 interface Props {
   params: { slug: string }
@@ -168,22 +169,34 @@ export default async function GalleryImagePage({ params }: Props) {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
   const pageUrl = `${baseUrl}/gallery/${image.slug}`
 
-  const imageObjectSchema = {
+  const imageObjectSchema = generateImageObjectSchema({
+    url: image.public_url || '',
+    title: image.title,
+    altText: image.alt_text || `${image.title} — Photography by Abdul Al Jubayer`,
+    description: image.description || image.seo_description || image.title,
+    caption: image.caption || image.title,
+    authorName: 'Abdul Al Jubayer',
+    width: image.width || 1200,
+    height: image.height || 800,
+    pageUrl,
+    uploadDate: image.created_at,
+  })
+
+  const breadcrumbSchema = {
     '@context': 'https://schema.org',
-    '@type': 'ImageObject',
-    name: image.title,
-    description: image.description,
-    contentUrl: image.public_url,
-    url: pageUrl,
-    author: { '@type': 'Person', name: 'Abdul Al Jubayer' },
-    ...(image.width && image.height ? { width: image.width, height: image.height } : {}),
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: baseUrl },
+      { '@type': 'ListItem', position: 2, name: 'Gallery', item: `${baseUrl}/gallery` },
+      { '@type': 'ListItem', position: 3, name: image.title, item: pageUrl },
+    ],
   }
 
   return (
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(imageObjectSchema) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify([imageObjectSchema, breadcrumbSchema]) }}
       />
 
       <div className="min-h-screen bg-[#0a0a0a] pt-28 pb-20">
@@ -212,7 +225,8 @@ export default async function GalleryImagePage({ params }: Props) {
               <div className="relative rounded-2xl overflow-hidden glass gradient-border">
                 <Image
                   src={image.public_url || `https://picsum.photos/seed/${image.slug}/1200/800`}
-                  alt={image.alt_text || image.title}
+                  alt={image.alt_text || `${image.title} — Photography by Abdul Al Jubayer | Visual Diary`}
+                  title={`${image.title} | Abdul Al Jubayer`}
                   width={image.width || 1200}
                   height={image.height || 800}
                   className="w-full h-auto"

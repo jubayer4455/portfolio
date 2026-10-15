@@ -109,7 +109,8 @@ export default function HeroSection({ settings, socials }: HeroSectionProps) {
                 <div className="relative w-full h-full rounded-full overflow-hidden bg-neutral-900">
                   <Image
                     src={avatarUrl}
-                    alt={fullName}
+                    alt={`${fullName} — ${tagline} Official Avatar Photo`}
+                    title={`${fullName} — Official Avatar`}
                     fill
                     unoptimized
                     priority

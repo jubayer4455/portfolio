@@ -3,6 +3,7 @@ import path from 'path'
 import os from 'os'
 import { revalidatePath } from 'next/cache'
 import { createClient as createServiceClient } from '@supabase/supabase-js'
+import { generatePhotoSeo } from '@/lib/seo-engine'
 
 export interface UserBioData {
   id: string
@@ -26,6 +27,7 @@ export interface UserBioData {
     id: string
     url: string
     caption?: string
+    alt_text?: string
   }>
   theme?: string
   font_family?: string
@@ -211,7 +213,21 @@ export async function saveUserBio(bio: Partial<UserBioData> & { user_id: string;
     phone: bio.phone !== undefined ? bio.phone : (existingIdx >= 0 ? all[existingIdx].phone : ''),
     email: bio.email !== undefined ? bio.email : (existingIdx >= 0 ? all[existingIdx].email : ''),
     social_links: bio.social_links || [],
-    photos: (bio.photos || []).slice(0, 4), // max 4 photos
+    photos: (bio.photos || []).slice(0, 4).map((p, idx) => {
+      const seo = generatePhotoSeo({
+        caption: p.caption,
+        displayName: bio.display_name,
+        username: cleanUser,
+        photoType: 'user-photo',
+        slotIndex: idx,
+      })
+      return {
+        id: p.id || `photo-${Date.now()}-${idx}`,
+        url: p.url,
+        caption: p.caption || `Featured Photo ${idx + 1}`,
+        alt_text: (p as any).alt_text || seo.alt_text,
+      }
+    }),
     theme: bio.theme || 'orange',
     font_family: bio.font_family || (existingIdx >= 0 ? all[existingIdx].font_family : 'sans'),
     bg_3d_style: bio.bg_3d_style || (existingIdx >= 0 ? all[existingIdx].bg_3d_style : 'particles'),

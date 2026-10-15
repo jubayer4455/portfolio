@@ -53,22 +53,26 @@
       {
         "id": "pic-1",
         "url": "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=800&q=80",
-        "caption": "Golden Hour Glow 🌅"
+        "caption": "Golden Hour Glow 🌅",
+        "alt_text": "Sarah Rahman (@sarah) — Golden Hour Glow 🌅 | Personal Visual Showcase & Story"
       },
       {
         "id": "pic-2",
         "url": "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=800&q=80",
-        "caption": "Urban Explorations 🏙️"
+        "caption": "Urban Explorations 🏙️",
+        "alt_text": "Sarah Rahman (@sarah) — Urban Explorations 🏙️ | Personal Visual Showcase & Story"
       },
       {
         "id": "pic-3",
         "url": "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=800&q=80",
-        "caption": "Coffee & Vibes ☕"
+        "caption": "Coffee & Vibes ☕",
+        "alt_text": "Sarah Rahman (@sarah) — Coffee & Vibes ☕ | Personal Visual Showcase & Story"
       },
       {
         "id": "pic-4",
         "url": "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&w=800&q=80",
-        "caption": "Weekend getaway moments 🌿"
+        "caption": "Weekend getaway moments 🌿",
+        "alt_text": "Sarah Rahman (@sarah) — Weekend getaway moments 🌿 | Personal Visual Showcase & Story"
       }
     ],
     "theme": "orange",
@@ -120,12 +124,14 @@
       {
         "id": "p-1",
         "url": "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=800&q=80",
-        "caption": "Late night code sessions 💻"
+        "caption": "Late night code sessions 💻",
+        "alt_text": "Abdul Al Jubayer (@jubayer) — Late night code sessions 💻 | Personal Visual Showcase & Story"
       },
       {
         "id": "p-2",
         "url": "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=800&q=80",
-        "caption": "Product Strategy & Architecture 📐"
+        "caption": "Product Strategy & Architecture 📐",
+        "alt_text": "Abdul Al Jubayer (@jubayer) — Product Strategy & Architecture 📐 | Personal Visual Showcase & Story"
       }
     ],
     "theme": "rose",

@@ -7,11 +7,19 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: '*',
-        allow: '/',
-        disallow: ['/admin/', '/admin/login', '/api/'],
+        allow: ['/', '/gallery', '/gallery/*', '/u/*', '/privacy'],
+        disallow: ['/admin/', '/api/'],
+      },
+      {
+        userAgent: 'Googlebot-Image',
+        allow: ['/', '/gallery/*', '/u/*', '/uploads/*'],
+        disallow: ['/admin/', '/api/'],
       },
     ],
-    sitemap: `${baseUrl}/sitemap.xml`,
+    sitemap: [
+      `${baseUrl}/sitemap.xml`,
+      `${baseUrl}/image-sitemap.xml`,
+    ],
     host: baseUrl,
   }
 }

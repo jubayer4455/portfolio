@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getGalleryItems, saveGalleryItems, type GalleryImageData } from '@/lib/content-store'
+import { generatePhotoSeo } from '@/lib/seo-engine'
 import { createClient as createServiceClient } from '@supabase/supabase-js'
 
 export const dynamic = 'force-dynamic'
@@ -70,27 +71,34 @@ export async function POST(req: NextRequest) {
     }
 
     const currentImages = await getGalleryItems()
-    const slug =
-      title
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/^-|-$/g, '') +
-      '-' +
-      Date.now()
+    
+    // Auto-generate rich, intelligent SEO metadata for the photo
+    const seoData = generatePhotoSeo({
+      title,
+      category: category || 'Photography',
+      description,
+      caption,
+      photoType: 'gallery',
+      authorName: 'Abdul Al Jubayer',
+    })
+
+    const slug = seoData.slug
 
     const newImage: GalleryImageData = {
       id: String(Date.now()),
       title: String(title),
       category: category ? String(category) : 'Photography',
       slug,
-      description: description ? String(description) : '',
-      alt_text: alt_text ? String(alt_text) : String(title),
-      caption: caption ? String(caption) : '',
+      description: description ? String(description) : seoData.seo_description,
+      alt_text: alt_text && String(alt_text).trim().length > String(title).trim().length ? String(alt_text) : seoData.alt_text,
+      caption: caption ? String(caption) : seoData.caption,
       public_url: String(public_url),
       width: width ? Number(width) : 800,
       height: height ? Number(height) : 600,
       is_public: is_public !== undefined ? Boolean(is_public) : true,
       is_featured: is_featured !== undefined ? Boolean(is_featured) : false,
+      seo_title: body.seo_title || seoData.seo_title,
+      seo_description: body.seo_description || seoData.seo_description,
       sort_order: currentImages.length + 1,
     }
 

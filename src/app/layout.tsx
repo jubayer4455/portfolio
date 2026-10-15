@@ -2,7 +2,8 @@ import type { Metadata, Viewport } from 'next'
 import { Inter, Playfair_Display } from 'next/font/google'
 import { Suspense } from 'react'
 import './globals.css'
-import { getSiteSettings } from '@/lib/content-store'
+import { getSiteSettings, getGalleryItems } from '@/lib/content-store'
+import { generateMainSiteSchema } from '@/lib/seo-engine'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -119,18 +120,12 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  const settings = await getSiteSettings()
-  const fullName = `${settings.first_name} ${settings.last_name}`.trim()
+  const [settings, galleryItems] = await Promise.all([
+    getSiteSettings(),
+    getGalleryItems().catch(() => []),
+  ])
 
-  const personSchema = {
-    '@context': 'https://schema.org',
-    '@type': 'Person',
-    name: fullName,
-    url: siteUrl,
-    jobTitle: settings.tagline,
-    description: settings.bio_intro,
-    image: `${siteUrl}/profile.jpg`,
-  }
+  const schemas = generateMainSiteSchema(settings, galleryItems, siteUrl)
 
   return (
     <html
@@ -141,7 +136,7 @@ export default async function RootLayout({
       <head>
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(personSchema) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(schemas) }}
         />
       </head>
       <body className="bg-[#0a0a0a] text-[#fafafa] font-sans antialiased">

@@ -245,7 +245,8 @@ function GalleryCard({
         ) : (
           <Image
             src={item.src}
-            alt={item.title}
+            alt={`${item.title} — ${item.category} Photography by Abdul Al Jubayer | Visual Diary`}
+            title={`${item.title} | Abdul Al Jubayer Visual Diary`}
             fill
             unoptimized
             loading="lazy"
@@ -346,7 +347,8 @@ function Lightbox({
           ) : (
             <Image
               src={item.src}
-              alt={item.title}
+              alt={`${item.title} — Full HD ${item.category} capture by Abdul Al Jubayer | Visual Diary`}
+              title={`${item.title} | ${item.category}`}
               fill
               unoptimized
               className="object-contain"

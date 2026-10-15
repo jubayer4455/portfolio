@@ -113,7 +113,8 @@ export default function BioFlippableCard({
               {bio.cover_url ? (
                 <Image
                   src={bio.cover_url}
-                  alt={`${bio.display_name} cover banner`}
+                  alt={`${bio.display_name} (@${bio.username}) — Official Header Banner & Visual Cover`}
+                  title={`${bio.display_name} Header Banner`}
                   fill
                   className="object-cover"
                   priority
@@ -156,7 +157,8 @@ export default function BioFlippableCard({
                     {bio.avatar_url ? (
                       <Image
                         src={bio.avatar_url}
-                        alt={bio.display_name}
+                        alt={`${bio.display_name} (@${bio.username}) — Official Profile Photo & Link-in-Bio Avatar`}
+                        title={`${bio.display_name} Official Profile Photo`}
                         fill
                         className="object-cover group-hover:scale-105 transition-transform duration-500"
                         priority

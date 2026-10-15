@@ -56,7 +56,8 @@ export default function FeaturedCreatorsSection({ featuredUsers }: Props) {
                 {user.cover_url ? (
                   <Image
                     src={user.cover_url}
-                    alt={user.display_name}
+                    alt={`${user.display_name} (@${user.username}) — Profile Cover Banner`}
+                    title={`${user.display_name} Banner`}
                     fill
                     loading="lazy"
                     sizes="(max-width: 768px) 100vw, 33vw"
@@ -79,7 +80,8 @@ export default function FeaturedCreatorsSection({ featuredUsers }: Props) {
                         {user.avatar_url ? (
                           <Image
                             src={user.avatar_url}
-                            alt={user.display_name}
+                            alt={`${user.display_name} (@${user.username}) — Profile Avatar`}
+                            title={`${user.display_name} Avatar`}
                             fill
                             loading="lazy"
                             sizes="64px"

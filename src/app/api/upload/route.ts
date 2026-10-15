@@ -123,9 +123,19 @@ export async function POST(req: NextRequest) {
     ext = 'jpg'
   }
 
-  const timestamp = Date.now()
-  const randomSuffix = Math.random().toString(36).slice(2, 8)
-  const uniqueFilename = `${timestamp}-${randomSuffix}.${ext}`
+  const cleanBase = fileName
+    .replace(/\.[^.]+$/, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .slice(0, 40)
+    .replace(/^-|-$/g, '')
+
+  const keywordSlug = cleanBase && cleanBase !== 'photo' && cleanBase !== 'image' && cleanBase !== 'upload'
+    ? `jubayer-${cleanBase}`
+    : 'abdul-al-jubayer-visual-capture'
+
+  const randomSuffix = Math.random().toString(36).slice(2, 7)
+  const uniqueFilename = `${keywordSlug}-${Date.now().toString().slice(-6)}-${randomSuffix}.${ext}`
   const storagePath = `uploads/${uniqueFilename}`
 
   // 1. Try Supabase Storage

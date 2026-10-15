@@ -141,7 +141,7 @@
       "category": "Portraits",
       "slug": "golden-hour-portrait",
       "description": "Caught under the soft rays of evening golden hour.",
-      "alt_text": "Portrait during golden hour",
+      "alt_text": "Golden Hour Portrait — Portraits Photography by Abdul Al Jubayer | Captured Moments & Visual Diary",
       "caption": "Golden hour glow",
       "public_url": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80",
       "width": 800,
@@ -149,7 +149,9 @@
       "is_public": true,
       "is_featured": true,
       "sort_order": 1,
-      "likes_count": 47
+      "likes_count": 47,
+      "seo_title": "Golden Hour Portrait — Portraits | Abdul Al Jubayer",
+      "seo_description": "Golden Hour Portrait: Caught under the soft rays of evening golden hour. — Portraits photography by Abdul Al Jubayer."
     },
     {
       "id": "2",
@@ -157,7 +159,7 @@
       "category": "Lifestyle",
       "slug": "morning-brew-lifestyle",
       "description": "Slow morning coffee rituals and peaceful vibes.",
-      "alt_text": "Coffee cup and reading book on a wooden table",
+      "alt_text": "Morning Brew & Cafe Reads — Lifestyle Photography by Abdul Al Jubayer | Captured Moments & Visual Diary",
       "caption": "Every good day starts with coffee",
       "public_url": "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=800&q=80",
       "width": 800,
@@ -165,7 +167,9 @@
       "is_public": true,
       "is_featured": false,
       "sort_order": 2,
-      "likes_count": 31
+      "likes_count": 31,
+      "seo_title": "Morning Brew & Cafe Reads — Lifestyle | Abdul Al Jubayer",
+      "seo_description": "Morning Brew & Cafe Reads: Slow morning coffee rituals and peaceful vibes. — Lifestyle photography by Abdul Al Jubayer."
     },
     {
       "id": "3",
@@ -173,7 +177,7 @@
       "category": "Travel",
       "slug": "kyoto-wanderlust",
       "description": "Walking through ancient streets surrounded by bamboo and lanterns.",
-      "alt_text": "Lanterns and streets of Kyoto",
+      "alt_text": "Kyoto Wanderlust — Travel Photography by Abdul Al Jubayer | Captured Moments & Visual Diary",
       "caption": "Lost in the alleys of Japan",
       "public_url": "https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=800&q=80",
       "width": 800,
@@ -181,7 +185,9 @@
       "is_public": true,
       "is_featured": true,
       "sort_order": 3,
-      "likes_count": 58
+      "likes_count": 58,
+      "seo_title": "Kyoto Wanderlust — Travel | Abdul Al Jubayer",
+      "seo_description": "Kyoto Wanderlust: Walking through ancient streets surrounded by bamboo and lanterns. — Travel photography by Abdul Al Jubayer."
     },
     {
       "id": "4",
@@ -189,7 +195,7 @@
       "category": "Vibes",
       "slug": "rooftop-sunset-horizon",
       "description": "Chilling at dusk watching the cityscape turn into glowing lights.",
-      "alt_text": "Sunset horizon over the city",
+      "alt_text": "Rooftop Sunset Horizon — Vibes Photography by Abdul Al Jubayer | Captured Moments & Visual Diary",
       "caption": "Sunset silhouettes",
       "public_url": "https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?auto=format&fit=crop&w=800&q=80",
       "width": 800,
@@ -197,7 +203,9 @@
       "is_public": true,
       "is_featured": false,
       "sort_order": 4,
-      "likes_count": 27
+      "likes_count": 27,
+      "seo_title": "Rooftop Sunset Horizon — Vibes | Abdul Al Jubayer",
+      "seo_description": "Rooftop Sunset Horizon: Chilling at dusk watching the cityscape turn into glowing lights. — Vibes photography by Abdul Al Jubayer."
     },
     {
       "id": "5",
@@ -205,7 +213,7 @@
       "category": "Portraits",
       "slug": "minimal-studio-portrait",
       "description": "High contrast black and white portrait study.",
-      "alt_text": "Studio portrait with dramatic lighting",
+      "alt_text": "Minimal Studio Portrait — Portraits Photography by Abdul Al Jubayer | Captured Moments & Visual Diary",
       "caption": "Mood & contrast",
       "public_url": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=800&q=80",
       "width": 800,
@@ -213,7 +221,9 @@
       "is_public": true,
       "is_featured": false,
       "sort_order": 5,
-      "likes_count": 39
+      "likes_count": 39,
+      "seo_title": "Minimal Studio Portrait — Portraits | Abdul Al Jubayer",
+      "seo_description": "Minimal Studio Portrait: High contrast black and white portrait study. — Portraits photography by Abdul Al Jubayer."
     },
     {
       "id": "6",
@@ -221,7 +231,7 @@
       "category": "Travel",
       "slug": "mountain-serenity",
       "description": "High altitude breathing and mirror-calm mountain lake.",
-      "alt_text": "Mountain peaks reflecting in lake",
+      "alt_text": "Mountain Serenity — Travel Photography by Abdul Al Jubayer | Captured Moments & Visual Diary",
       "caption": "Peace above the clouds",
       "public_url": "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=800&q=80",
       "width": 800,
@@ -229,7 +239,9 @@
       "is_public": true,
       "is_featured": true,
       "sort_order": 6,
-      "likes_count": 64
+      "likes_count": 64,
+      "seo_title": "Mountain Serenity — Travel | Abdul Al Jubayer",
+      "seo_description": "Mountain Serenity: High altitude breathing and mirror-calm mountain lake. — Travel photography by Abdul Al Jubayer."
     },
     {
       "id": "7",
@@ -237,7 +249,7 @@
       "category": "Vibes",
       "slug": "neon-night-walk",
       "description": "Rain-slicked asphalt reflecting vivid neon glow.",
-      "alt_text": "Night lights reflecting in the rain",
+      "alt_text": "Neon Night Walk — Vibes Photography by Abdul Al Jubayer | Captured Moments & Visual Diary",
       "caption": "City lights after rainfall",
       "public_url": "https://images.unsplash.com/photo-1514565131-fce0801e5785?auto=format&fit=crop&w=800&q=80",
       "width": 800,
@@ -245,7 +257,9 @@
       "is_public": true,
       "is_featured": false,
       "sort_order": 7,
-      "likes_count": 33
+      "likes_count": 33,
+      "seo_title": "Neon Night Walk — Vibes | Abdul Al Jubayer",
+      "seo_description": "Neon Night Walk: Rain-slicked asphalt reflecting vivid neon glow. — Vibes photography by Abdul Al Jubayer."
     },
     {
       "id": "8",
@@ -253,7 +267,7 @@
       "category": "Lifestyle",
       "slug": "creative-aesthetic-corner",
       "description": "Warm ambient lighting, journal, camera, and everyday essentials.",
-      "alt_text": "Aesthetic workspace with camera and journal",
+      "alt_text": "Creative Aesthetic Corner — Lifestyle Photography by Abdul Al Jubayer | Captured Moments & Visual Diary",
       "caption": "Daily inspiration station",
       "public_url": "https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=800&q=80",
       "width": 800,
@@ -261,7 +275,9 @@
       "is_public": true,
       "is_featured": false,
       "sort_order": 8,
-      "likes_count": 22
+      "likes_count": 22,
+      "seo_title": "Creative Aesthetic Corner — Lifestyle | Abdul Al Jubayer",
+      "seo_description": "Creative Aesthetic Corner: Warm ambient lighting, journal, camera, and everyday essentials. — Lifestyle photography by Abdul Al Jubayer."
     }
   ]
 }

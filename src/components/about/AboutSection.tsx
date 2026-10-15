@@ -91,7 +91,8 @@ export default function AboutSection({ settings }: { settings?: SiteSettingsData
                 <div className="relative aspect-[4/5] rounded-2xl overflow-hidden bg-neutral-900">
                     <Image
                       src={avatarUrl}
-                      alt={fullName}
+                      alt={`${fullName} — Visual Creator & Lifestyle Storyteller Official Portrait`}
+                      title={`${fullName} — About Official Portrait`}
                       fill
                       unoptimized
                       loading="lazy"

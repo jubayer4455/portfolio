@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { getUserBioByUsername } from '@/lib/builder-store'
+import { generateUserBioSchema } from '@/lib/seo-engine'
 import UserBioClientView from './UserBioClientView'
 
 export const dynamic = 'force-dynamic'
@@ -25,22 +26,29 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     }
   }
 
-  const title = `${bio.display_name} (@${bio.username}) — Official Bio Link`
-  const description = bio.tagline || bio.bio || `Connect with ${bio.display_name} across all social platforms.`
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://jubayer.me'
+  const title = `${bio.display_name} (@${bio.username}) — Official 3D Link in Bio`
+  const description = bio.tagline || bio.bio || `Connect with ${bio.display_name} (@${bio.username}) across all social platforms, view photos, and chat.`
+  const profileImages = [bio.avatar_url, bio.cover_url].filter(Boolean) as string[]
 
   return {
     title,
     description,
+    alternates: {
+      canonical: `${baseUrl}/u/${bio.username}`,
+    },
     openGraph: {
       title,
       description,
-      images: bio.avatar_url ? [{ url: bio.avatar_url }] : [],
+      url: `${baseUrl}/u/${bio.username}`,
+      type: 'profile',
+      images: profileImages.map((img) => ({ url: img, alt: `${bio.display_name} Profile` })),
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description,
-      images: bio.avatar_url ? [bio.avatar_url] : [],
+      images: profileImages,
     },
   }
 }
@@ -48,6 +56,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function UserBioPage({ params }: Props) {
   const cleanUser = decodeURIComponent(params.username || '').replace(/^@+/, '').trim()
   const bio = await getUserBioByUsername(cleanUser)
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://jubayer.me'
 
   if (!bio) {
     return (
@@ -64,7 +73,7 @@ export default async function UserBioPage({ params }: Props) {
           </p>
           <div className="space-y-3">
             <Link href="/signup" className="btn-primary w-full justify-center text-xs py-2.5">
-              Claim @{params.username} & Build Bio 🚀
+              Claim @{params.username} &amp; Build Bio 🚀
             </Link>
             <Link href="/" className="block text-white/40 hover:text-white text-xs">
               ← Back to Homepage
@@ -75,5 +84,15 @@ export default async function UserBioPage({ params }: Props) {
     )
   }
 
-  return <UserBioClientView bio={bio} />
+  const bioSchema = generateUserBioSchema(bio, baseUrl)
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(bioSchema) }}
+      />
+      <UserBioClientView bio={bio} />
+    </>
+  )
 }

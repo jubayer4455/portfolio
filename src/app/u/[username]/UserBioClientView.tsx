@@ -247,7 +247,8 @@ export default function UserBioClientView({ bio }: Props) {
                 >
                   <Image
                     src={photo.url}
-                    alt={photo.caption || `Photo ${i + 1}`}
+                    alt={photo.alt_text || `${bio.display_name} (@${bio.username}) — ${photo.caption || 'Featured Photo ' + (i + 1)} | Personal Visual Showcase`}
+                    title={`${bio.display_name} — ${photo.caption || 'Showcase Photo'}`}
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-500"
                     unoptimized
@@ -394,7 +395,8 @@ export default function UserBioClientView({ bio }: Props) {
                 <div className="relative w-full aspect-[4/3] rounded-3xl overflow-hidden border border-white/10">
                   <Image
                     src={activePhoto.url}
-                    alt={activePhoto.caption || 'Enlarged photo'}
+                    alt={activePhoto.caption ? `${bio.display_name} — ${activePhoto.caption} HD Visual View` : `${bio.display_name} Photo Showcase HD`}
+                    title={activePhoto.caption || `${bio.display_name} Showcase Photo`}
                     fill
                     className="object-contain"
                     unoptimized

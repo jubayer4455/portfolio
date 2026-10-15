@@ -32,9 +32,22 @@ const imageObjectSchema = (images: GalleryImage[], baseUrl: string) => ({
       item: {
         '@type': 'ImageObject',
         name: img.title,
-        description: img.description,
+        headline: img.title,
+        description: img.alt_text || img.description || `${img.title} — Photography by Abdul Al Jubayer`,
+        caption: img.caption || img.title,
         contentUrl: img.public_url,
         url: `${baseUrl}/gallery/${img.slug}`,
+        author: {
+          '@type': 'Person',
+          name: 'Abdul Al Jubayer',
+          url: baseUrl,
+        },
+        copyrightHolder: {
+          '@type': 'Person',
+          name: 'Abdul Al Jubayer',
+        },
+        width: img.width || 1200,
+        height: img.height || 800,
       },
     })),
   },
@@ -220,7 +233,8 @@ export default async function GalleryPage() {
                   >
                     <Image
                       src={image.public_url || `https://picsum.photos/seed/${image.slug}/800/600`}
-                      alt={image.alt_text || image.title}
+                      alt={image.alt_text || `${image.title} — Photography by Abdul Al Jubayer | Visual Diary`}
+                      title={`${image.title} | Abdul Al Jubayer`}
                       fill
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                       className="object-cover transition-transform duration-500 group-hover:scale-110"

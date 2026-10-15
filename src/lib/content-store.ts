@@ -94,6 +94,8 @@ export interface GalleryImageData {
   is_featured: boolean
   sort_order: number
   likes_count?: number
+  seo_title?: string
+  seo_description?: string
 }
 
 export interface AnonymousMessageData {
