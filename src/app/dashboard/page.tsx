@@ -40,6 +40,9 @@ import {
   Layers,
   MessageSquare,
   Smartphone,
+  Mic,
+  Video,
+  Clock,
 } from 'lucide-react'
 import PlatformIcon from '@/components/common/PlatformIcon'
 import BioInstagramStoryModal from '@/components/bio/BioInstagramStoryModal'
@@ -1476,6 +1479,207 @@ export default function UserDashboard() {
                           ))}
                         </div>
                       </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* 5. Voice Greeting / Audio Intro */}
+                <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/10 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Mic size={18} className="text-orange-400" />
+                      <div>
+                        <p className="text-white font-semibold text-xs">🎙️ Voice Greeting / Audio Intro</p>
+                        <p className="text-white/40 text-[10px]">Play your recorded voice introduction to visitors</p>
+                      </div>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={bioData.voice_intro_enabled || false}
+                        onChange={(e) =>
+                          setBioData((p) => ({ ...p, voice_intro_enabled: e.target.checked }))
+                        }
+                        className="sr-only peer"
+                      />
+                      <div className="w-9 h-5 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-orange-500"></div>
+                    </label>
+                  </div>
+
+                  {bioData.voice_intro_enabled && (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-white/5">
+                      <div>
+                        <label className="text-[10px] text-white/50 block mb-1">Greeting Title</label>
+                        <input
+                          type="text"
+                          placeholder="Hey, welcome to my profile! 🎙️"
+                          value={bioData.voice_intro_title || ''}
+                          onChange={(e) =>
+                            setBioData((p) => ({ ...p, voice_intro_title: e.target.value }))
+                          }
+                          className="w-full px-3 py-1.5 rounded-xl glass border border-white/10 text-white text-xs placeholder-white/20"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[10px] text-white/50 block mb-1">Audio MP3 URL</label>
+                        <input
+                          type="url"
+                          placeholder="https://..."
+                          value={bioData.voice_intro_url || ''}
+                          onChange={(e) =>
+                            setBioData((p) => ({ ...p, voice_intro_url: e.target.value }))
+                          }
+                          className="w-full px-3 py-1.5 rounded-xl glass border border-white/10 text-white text-xs placeholder-white/20"
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* 6. Live Media Embed (YouTube / Spotify) */}
+                <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/10 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Video size={18} className="text-red-400" />
+                      <div>
+                        <p className="text-white font-semibold text-xs">📺 Live YouTube / Spotify Embed</p>
+                        <p className="text-white/40 text-[10px]">Embed video, music, or podcast directly in your bio</p>
+                      </div>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={bioData.media_embed_enabled || false}
+                        onChange={(e) =>
+                          setBioData((p) => ({ ...p, media_embed_enabled: e.target.checked }))
+                        }
+                        className="sr-only peer"
+                      />
+                      <div className="w-9 h-5 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-orange-500"></div>
+                    </label>
+                  </div>
+
+                  {bioData.media_embed_enabled && (
+                    <div className="space-y-3 pt-2 border-t border-white/5">
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div>
+                          <label className="text-[10px] text-white/50 block mb-1">Type</label>
+                          <select
+                            value={bioData.media_embed_type || 'youtube'}
+                            onChange={(e) =>
+                              setBioData((p) => ({ ...p, media_embed_type: e.target.value as any }))
+                            }
+                            className="w-full px-3 py-1.5 rounded-xl glass border border-white/10 text-white text-xs bg-[#0f0f12]"
+                          >
+                            <option value="youtube">YouTube Video</option>
+                            <option value="spotify">Spotify Song / Playlist</option>
+                          </select>
+                        </div>
+                        <div className="sm:col-span-2">
+                          <label className="text-[10px] text-white/50 block mb-1">Tile Title</label>
+                          <input
+                            type="text"
+                            placeholder="My Favorite Song / Latest Video 📺"
+                            value={bioData.media_embed_title || ''}
+                            onChange={(e) =>
+                              setBioData((p) => ({ ...p, media_embed_title: e.target.value }))
+                            }
+                            className="w-full px-3 py-1.5 rounded-xl glass border border-white/10 text-white text-xs placeholder-white/20"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="text-[10px] text-white/50 block mb-1">Media URL</label>
+                        <input
+                          type="url"
+                          placeholder="https://www.youtube.com/watch?v=... or https://open.spotify.com/..."
+                          value={bioData.media_embed_url || ''}
+                          onChange={(e) =>
+                            setBioData((p) => ({ ...p, media_embed_url: e.target.value }))
+                          }
+                          className="w-full px-3 py-1.5 rounded-xl glass border border-white/10 text-white text-xs placeholder-white/20"
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* 7. Community Voting Poll */}
+                <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/10 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <BarChart3 size={18} className="text-emerald-400" />
+                      <div>
+                        <p className="text-white font-semibold text-xs">📊 Interactive Visitor Poll</p>
+                        <p className="text-white/40 text-[10px]">Ask your audience a question and collect votes</p>
+                      </div>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={bioData.poll_enabled || false}
+                        onChange={(e) =>
+                          setBioData((p) => ({ ...p, poll_enabled: e.target.checked }))
+                        }
+                        className="sr-only peer"
+                      />
+                      <div className="w-9 h-5 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-orange-500"></div>
+                    </label>
+                  </div>
+
+                  {bioData.poll_enabled && (
+                    <div className="space-y-3 pt-2 border-t border-white/5">
+                      <div>
+                        <label className="text-[10px] text-white/50 block mb-1">Question</label>
+                        <input
+                          type="text"
+                          placeholder="What photo set should I post next? 📸"
+                          value={bioData.poll_question || ''}
+                          onChange={(e) =>
+                            setBioData((p) => ({ ...p, poll_question: e.target.value }))
+                          }
+                          className="w-full px-3 py-1.5 rounded-xl glass border border-white/10 text-white text-xs placeholder-white/20"
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* 8. Real-Time Clock & Weather */}
+                <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/10 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Clock size={18} className="text-cyan-400" />
+                      <div>
+                        <p className="text-white font-semibold text-xs">🌍 Real-Time Clock &amp; Weather Badge</p>
+                        <p className="text-white/40 text-[10px]">Display live local time and temperature to visitors</p>
+                      </div>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={bioData.weather_enabled !== false}
+                        onChange={(e) =>
+                          setBioData((p) => ({ ...p, weather_enabled: e.target.checked }))
+                        }
+                        className="sr-only peer"
+                      />
+                      <div className="w-9 h-5 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-orange-500"></div>
+                    </label>
+                  </div>
+
+                  {bioData.weather_enabled !== false && (
+                    <div className="pt-2 border-t border-white/5">
+                      <label className="text-[10px] text-white/50 block mb-1">City / Location Name</label>
+                      <input
+                        type="text"
+                        placeholder="Dhaka, BD"
+                        value={bioData.weather_location || bioData.location || ''}
+                        onChange={(e) =>
+                          setBioData((p) => ({ ...p, weather_location: e.target.value }))
+                        }
+                        className="w-full px-3 py-1.5 rounded-xl glass border border-white/10 text-white text-xs placeholder-white/20"
+                      />
                     </div>
                   )}
                 </div>

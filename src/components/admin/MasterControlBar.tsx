@@ -21,8 +21,10 @@ import {
   BellRing,
   Eye,
   EyeOff,
+  QrCode,
 } from 'lucide-react'
 import type { SiteSettingsData } from '@/lib/content-store'
+import MasterStoryCardModal from '@/components/admin/MasterStoryCardModal'
 
 interface Props {
   imageCount: number
@@ -44,6 +46,7 @@ export default function MasterControlBar({
   const [syncing, setSyncing] = useState(false)
   const [syncStatus, setSyncStatus] = useState<'idle' | 'success' | 'error'>('idle')
   const [lastSyncTime, setLastSyncTime] = useState<string | null>(null)
+  const [storyModalOpen, setStoryModalOpen] = useState(false)
 
   const handleLiveSync = async () => {
     setSyncing(true)
@@ -82,7 +85,17 @@ export default function MasterControlBar({
           </p>
         </div>
 
-        <div className="flex items-center gap-2.5">
+        <div className="flex flex-wrap items-center gap-2.5">
+          <button
+            type="button"
+            onClick={() => setStoryModalOpen(true)}
+            className="btn-glass text-xs py-2.5 px-3.5 inline-flex items-center gap-1.5 shadow-md active:scale-95"
+            title="Download Instagram Story / TikTok Card"
+          >
+            <QrCode size={13} className="text-orange-400" />
+            <span>Story Card (PNG)</span>
+          </button>
+
           <button
             onClick={handleLiveSync}
             disabled={syncing}
@@ -284,6 +297,13 @@ export default function MasterControlBar({
           Music {settings.music_enabled !== false ? '• On' : '• Off'}
         </span>
       </div>
+
+      {/* 1-Click Instagram Story Card Modal */}
+      <MasterStoryCardModal
+        isOpen={storyModalOpen}
+        onClose={() => setStoryModalOpen(false)}
+        settings={settings}
+      />
     </div>
   )
 }

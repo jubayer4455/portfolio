@@ -15,8 +15,11 @@ import FaqSection from '@/components/home/FaqSection'
 import WebProjectsShowcase from '@/components/projects/WebProjectsShowcase'
 import { cookies } from 'next/headers'
 import Link from 'next/link'
-import { AlertTriangle } from 'lucide-react'
+import { AlertTriangle, Sparkles } from 'lucide-react'
 import MaintenanceScreen from '@/components/common/MaintenanceScreen'
+import CursorNeonTrail from '@/components/common/CursorNeonTrail'
+import MediaEmbedCard from '@/components/interactive/MediaEmbedCard'
+import InteractivePollCard from '@/components/interactive/InteractivePollCard'
 import { getSiteSettings, getSocialProfiles, getGalleryItems } from '@/lib/content-store'
 import { getApprovedReviews, getAllUserBios } from '@/lib/builder-store'
 import { getFeaturedProjects } from '@/lib/projects-store'
@@ -70,6 +73,7 @@ export default async function HomePage() {
         Skip to main content
       </a>
       <VisitTracker />
+      <CursorNeonTrail enabled={settings.cursor_effects_enabled !== false} />
       <div className={settings.maintenance_mode_enabled && isAdmin ? 'pt-8' : ''}>
         <Navigation settings={settings} />
       </div>
@@ -103,6 +107,46 @@ export default async function HomePage() {
               <FeaturedCreatorsSection featuredUsers={featuredUsers} />
             )}
           </>
+        )}
+
+        {/* Media Embed & Community Poll Interactive Section */}
+        {(settings.media_embed_enabled !== false || settings.poll_enabled !== false) && (
+          <section className="section-padding bg-[#070707] relative overflow-hidden" id="interactive-spotlight">
+            <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-[500px] h-[500px] bg-orange-500/5 blur-[120px] pointer-events-none" />
+            <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-purple-500/5 blur-[120px] pointer-events-none" />
+
+            <div className="container-max px-4 md:px-8 relative z-10">
+              <div className="text-center max-w-xl mx-auto mb-10">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-400 text-xs font-semibold mb-3">
+                  <Sparkles size={12} />
+                  <span>INTERACTIVE SPOTLIGHT</span>
+                </div>
+                <h2 className="heading-md">Featured Media &amp; Community Voice</h2>
+                <p className="text-muted mt-2 text-sm">
+                  Watch latest creative visuals and vote on what projects I should ship next.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-5xl mx-auto">
+                {settings.media_embed_enabled !== false && (
+                  <MediaEmbedCard
+                    enabled={true}
+                    type={settings.media_embed_type || 'youtube'}
+                    url={settings.media_embed_url || 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'}
+                    title={settings.media_embed_title || 'Featured Creative Visual 📺'}
+                  />
+                )}
+
+                {settings.poll_enabled !== false && (
+                  <InteractivePollCard
+                    enabled={true}
+                    question={settings.poll_question}
+                    options={settings.poll_options}
+                  />
+                )}
+              </div>
+            </div>
+          </section>
         )}
 
         {settings.about_enabled !== false && (

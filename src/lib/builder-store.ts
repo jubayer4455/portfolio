@@ -48,6 +48,18 @@ export interface UserBioData {
   music_enabled?: boolean
   music_title?: string
   music_url?: string
+  voice_intro_enabled?: boolean
+  voice_intro_title?: string
+  voice_intro_url?: string
+  media_embed_enabled?: boolean
+  media_embed_type?: 'youtube' | 'spotify'
+  media_embed_url?: string
+  media_embed_title?: string
+  poll_enabled?: boolean
+  poll_question?: string
+  poll_options?: Array<{ id: string; text: string; votes: number }>
+  weather_enabled?: boolean
+  weather_location?: string
   layout_style?: 'classic' | 'bento'
   created_at: string
   updated_at: string

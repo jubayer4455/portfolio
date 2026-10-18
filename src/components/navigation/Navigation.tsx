@@ -3,7 +3,8 @@
 import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Menu, X } from 'lucide-react'
-
+import SoundToggle from '@/components/common/SoundToggle'
+import ThemeSwitcher from '@/components/common/ThemeSwitcher'
 import type { SiteSettingsData } from '@/lib/content-store'
 
 const navLinks = [
@@ -152,7 +153,15 @@ export default function Navigation({ settings }: { settings?: SiteSettingsData }
           </ul>
 
           {/* CTA + Bio Builder + Mobile toggle */}
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2">
+            {settings?.sound_effects_enabled !== false && (
+              <SoundToggle className="hidden sm:inline-flex" />
+            )}
+
+            {settings?.theme_switcher_enabled !== false && (
+              <ThemeSwitcher enabled={true} className="hidden sm:inline-block" />
+            )}
+
             <a
               href="/dashboard"
               className="hidden lg:inline-flex items-center gap-1.5 text-xs font-semibold px-3.5 py-2 rounded-full glass border border-orange-500/30 text-orange-400 hover:bg-orange-500/10 transition-colors"
@@ -227,6 +236,10 @@ export default function Navigation({ settings }: { settings?: SiteSettingsData }
                 ))}
 
                 <div className="pt-2 mt-2 border-t border-white/10 flex flex-col gap-2">
+                  <div className="flex items-center justify-between gap-2 py-1">
+                    <ThemeSwitcher enabled={true} className="flex-1" />
+                    <SoundToggle className="flex-1 justify-center" />
+                  </div>
                   <a
                     href="/dashboard"
                     className="btn-primary justify-center text-xs py-2.5"

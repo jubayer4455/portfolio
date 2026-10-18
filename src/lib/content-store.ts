@@ -68,6 +68,36 @@ export interface SiteSettingsData {
   // Google Search Console & Analytics
   google_site_verification?: string
   google_analytics_id?: string
+
+  // Voice Intro / Audio Greeting
+  voice_intro_enabled?: boolean
+  voice_intro_title?: string
+  voice_intro_url?: string
+
+  // Live Media Embed (YouTube / Spotify)
+  media_embed_enabled?: boolean
+  media_embed_type?: 'youtube' | 'spotify'
+  media_embed_url?: string
+  media_embed_title?: string
+
+  // Interactive Poll
+  poll_enabled?: boolean
+  poll_question?: string
+  poll_options?: Array<{ id: string; text: string; votes: number }>
+
+  // Subtle Sound Effects (Apple / Cyber Haptics)
+  sound_effects_enabled?: boolean
+
+  // Dynamic Weather & Time Widget
+  weather_widget_enabled?: boolean
+  weather_location_name?: string
+  weather_timezone?: string
+
+  // Mouse Neon Glow Trail & Touch Ripple
+  cursor_effects_enabled?: boolean
+
+  // Quick Theme Switcher
+  theme_switcher_enabled?: boolean
 }
 
 export interface SocialProfileData {
@@ -287,7 +317,7 @@ export async function updateSiteSettings(
         .filter(([key]) => !key.endsWith('_json'))
         .map(([key, value]) => ({
           key,
-          value: String(value),
+          value: typeof value === 'object' ? JSON.stringify(value) : String(value),
           updated_at: new Date().toISOString(),
         }))
       await supabase.from('site_settings').upsert(rows)

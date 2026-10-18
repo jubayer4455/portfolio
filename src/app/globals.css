@@ -7,9 +7,31 @@
   --foreground: #fafafa;
   --card: #111111;
   --card-border: rgba(255, 255, 255, 0.08);
-  --orange: #F97316;
-  --orange-glow: rgba(249, 115, 22, 0.15);
+  --color-primary: #F97316;
+  --color-primary-glow: rgba(249, 115, 22, 0.15);
+  --orange: var(--color-primary);
+  --orange-glow: var(--color-primary-glow);
   --muted: #888888;
+}
+
+[data-theme='purple'] {
+  --color-primary: #A855F7;
+  --color-primary-glow: rgba(168, 85, 247, 0.2);
+}
+
+[data-theme='cyan'] {
+  --color-primary: #06B6D4;
+  --color-primary-glow: rgba(6, 182, 212, 0.2);
+}
+
+[data-theme='emerald'] {
+  --color-primary: #10B981;
+  --color-primary-glow: rgba(16, 185, 129, 0.2);
+}
+
+[data-theme='rose'] {
+  --color-primary: #F43F5E;
+  --color-primary-glow: rgba(244, 63, 94, 0.2);
 }
 
 html {

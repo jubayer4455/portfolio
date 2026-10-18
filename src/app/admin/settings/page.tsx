@@ -40,9 +40,17 @@ import {
   Search,
   BarChart2,
   ExternalLink,
+  Mic,
+  Volume2,
+  Video,
+  BarChart3,
+  Clock,
+  Palette,
+  QrCode,
 } from 'lucide-react'
 import type { SiteSettingsData } from '@/lib/content-store'
 import { processAndCompressImage, uploadImageFile } from '@/lib/image-compress'
+import MasterStoryCardModal from '@/components/admin/MasterStoryCardModal'
 
 const defaultSettings: SiteSettingsData = {
   site_name: 'Abdul Al Jubayer',
@@ -98,6 +106,29 @@ const defaultSettings: SiteSettingsData = {
   maintenance_mode_enabled: false,
   maintenance_title: "We're Upgrading the Experience ✨",
   maintenance_message: 'Our creative portfolio is currently undergoing scheduled improvements to bring you fresh content, smoother animations, and exciting new work. We will be back online shortly!',
+
+  // Viral & Micro-Interactions Features
+  voice_intro_enabled: true,
+  voice_intro_title: 'Voice Greeting 🎙️',
+  voice_intro_url: 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3',
+  media_embed_enabled: true,
+  media_embed_type: 'youtube',
+  media_embed_url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+  media_embed_title: 'Featured Creative Visual 📺',
+  poll_enabled: true,
+  poll_question: 'What project or content should I build next? 📊',
+  poll_options: [
+    { id: '1', text: 'More 3D Creative Web Experiments 🚀', votes: 42 },
+    { id: '2', text: 'Behind-the-scenes Vlog & Photography 📸', votes: 28 },
+    { id: '3', text: 'Interactive Digital Design Tutorials 💡', votes: 35 },
+    { id: '4', text: 'Open-Source Next.js Starters & Templates ⚡', votes: 51 },
+  ],
+  sound_effects_enabled: true,
+  weather_widget_enabled: true,
+  weather_location_name: 'Dhaka, BD',
+  weather_timezone: 'Asia/Dhaka',
+  cursor_effects_enabled: true,
+  theme_switcher_enabled: true,
 }
 
 export default function AdminSettingsPage() {
@@ -107,6 +138,7 @@ export default function AdminSettingsPage() {
   const [saving, setSaving] = useState(false)
   const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle')
   const [message, setMessage] = useState('')
+  const [storyModalOpen, setStoryModalOpen] = useState(false)
   const [uploadingAvatar, setUploadingAvatar] = useState(false)
   const [uploadError, setUploadError] = useState('')
 
@@ -194,7 +226,7 @@ export default function AdminSettingsPage() {
     }
   }
 
-  const handleChange = (field: keyof SiteSettingsData, value: string | boolean) => {
+  const handleChange = (field: keyof SiteSettingsData, value: any) => {
     setSettings((prev) => ({ ...prev, [field]: value }))
     setStatus('idle')
   }
@@ -311,6 +343,24 @@ export default function AdminSettingsPage() {
     } finally {
       setPasswordChanging(false)
     }
+  }
+
+  const handlePollOptionChange = (index: number, newText: string) => {
+    const currentOptions = settings.poll_options || [
+      { id: '1', text: 'More 3D Creative Web Experiments 🚀', votes: 42 },
+      { id: '2', text: 'Behind-the-scenes Vlog & Photography 📸', votes: 28 },
+      { id: '3', text: 'Interactive Digital Design Tutorials 💡', votes: 35 },
+      { id: '4', text: 'Open-Source Next.js Starters & Templates ⚡', votes: 51 },
+    ]
+    const updated = currentOptions.map((opt, i) => (i === index ? { ...opt, text: newText } : opt))
+    handleChange('poll_options', updated)
+  }
+
+  const handleResetPollVotes = () => {
+    if (!confirm('Are you sure you want to reset all poll votes to 0?')) return
+    const currentOptions = settings.poll_options || []
+    const updated = currentOptions.map((opt) => ({ ...opt, votes: 0 }))
+    handleChange('poll_options', updated)
   }
 
   const inputClass =
@@ -711,6 +761,326 @@ export default function AdminSettingsPage() {
                   className="w-4 h-4 rounded text-orange-500 bg-white/10 border-white/20 focus:ring-orange-500"
                 />
               </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ── VIRAL & INTERACTIVE CONTROLS CENTER ────────────────────── */}
+        <div className="glass gradient-border rounded-2xl p-6 space-y-6 bg-orange-500/[0.02]">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/[0.08] pb-4">
+            <div>
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-400 text-[11px] font-semibold mb-1">
+                <Sparkles size={11} />
+                <span>VIRAL &amp; ENGAGEMENT POWER</span>
+              </div>
+              <h2 className="text-white font-bold text-lg flex items-center gap-2">
+                Viral Features &amp; Sensory Micro-Interactions
+              </h2>
+              <p className="text-white/40 text-xs mt-0.5">
+                Toggle and customize Voice Intro, Media Embeds, Community Poll, Haptic Sounds, Weather clock, and Cursor glow.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setStoryModalOpen(true)}
+              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white text-xs font-semibold shadow-lg shadow-orange-500/20 active:scale-95 transition-all self-start sm:self-auto"
+            >
+              <QrCode size={14} />
+              <span>1-Click Story Card (PNG)</span>
+            </button>
+          </div>
+
+          <div className="space-y-5">
+            {/* 1. Voice Intro / Audio Greeting */}
+            <div className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.06] space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-lg bg-orange-500/20 text-orange-400 flex items-center justify-center">
+                    <Mic size={16} />
+                  </div>
+                  <div>
+                    <h3 className="text-white text-sm font-semibold">🎙️ Voice Greeting / Audio Intro</h3>
+                    <p className="text-white/40 text-xs">Playable personal audio greeting on your hero profile</p>
+                  </div>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={settings.voice_intro_enabled !== false}
+                    onChange={(e) => handleChange('voice_intro_enabled', e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-500"></div>
+                </label>
+              </div>
+
+              {settings.voice_intro_enabled !== false && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-white/[0.04]">
+                  <div>
+                    <label className="block text-white/50 text-[11px] font-medium mb-1">Badge Title</label>
+                    <input
+                      type="text"
+                      placeholder="Voice Greeting 🎙️"
+                      value={settings.voice_intro_title || ''}
+                      onChange={(e) => handleChange('voice_intro_title', e.target.value)}
+                      className="w-full px-3 py-1.5 rounded-lg glass text-xs text-white placeholder-white/30"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-white/50 text-[11px] font-medium mb-1">Audio MP3 / Recording URL</label>
+                    <input
+                      type="url"
+                      placeholder="https://cdn.pixabay.com/download/audio/..."
+                      value={settings.voice_intro_url || ''}
+                      onChange={(e) => handleChange('voice_intro_url', e.target.value)}
+                      className="w-full px-3 py-1.5 rounded-lg glass text-xs text-white placeholder-white/30"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* 2. Live Media Embed (YouTube / Spotify) */}
+            <div className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.06] space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-lg bg-red-500/20 text-red-400 flex items-center justify-center">
+                    <Video size={16} />
+                  </div>
+                  <div>
+                    <h3 className="text-white text-sm font-semibold">📺 Live YouTube / Spotify Embed Tile</h3>
+                    <p className="text-white/40 text-xs">Embed latest YouTube video/short or Spotify playlist on your profile</p>
+                  </div>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={settings.media_embed_enabled !== false}
+                    onChange={(e) => handleChange('media_embed_enabled', e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-500"></div>
+                </label>
+              </div>
+
+              {settings.media_embed_enabled !== false && (
+                <div className="space-y-3 pt-2 border-t border-white/[0.04]">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div>
+                      <label className="block text-white/50 text-[11px] font-medium mb-1">Platform Type</label>
+                      <select
+                        value={settings.media_embed_type || 'youtube'}
+                        onChange={(e) => handleChange('media_embed_type', e.target.value as 'youtube' | 'spotify')}
+                        className="w-full px-3 py-1.5 rounded-lg glass text-xs text-white bg-[#0e0e11]"
+                      >
+                        <option value="youtube">YouTube (Video / Shorts)</option>
+                        <option value="spotify">Spotify (Track / Playlist)</option>
+                      </select>
+                    </div>
+                    <div className="sm:col-span-2">
+                      <label className="block text-white/50 text-[11px] font-medium mb-1">Tile Title</label>
+                      <input
+                        type="text"
+                        placeholder="Featured Creative Visual 📺"
+                        value={settings.media_embed_title || ''}
+                        onChange={(e) => handleChange('media_embed_title', e.target.value)}
+                        className="w-full px-3 py-1.5 rounded-lg glass text-xs text-white placeholder-white/30"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-white/50 text-[11px] font-medium mb-1">Video / Song Embed URL</label>
+                    <input
+                      type="url"
+                      placeholder="https://www.youtube.com/watch?v=... or https://open.spotify.com/track/..."
+                      value={settings.media_embed_url || ''}
+                      onChange={(e) => handleChange('media_embed_url', e.target.value)}
+                      className="w-full px-3 py-1.5 rounded-lg glass text-xs text-white placeholder-white/30"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* 3. Community Poll Manager */}
+            <div className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.06] space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+                    <BarChart3 size={16} />
+                  </div>
+                  <div>
+                    <h3 className="text-white text-sm font-semibold">📊 Community Voting Poll Widget</h3>
+                    <p className="text-white/40 text-xs">Engage visitors with real-time interactive questions &amp; live voting</p>
+                  </div>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={settings.poll_enabled !== false}
+                    onChange={(e) => handleChange('poll_enabled', e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-500"></div>
+                </label>
+              </div>
+
+              {settings.poll_enabled !== false && (
+                <div className="space-y-3 pt-2 border-t border-white/[0.04]">
+                  <div>
+                    <label className="block text-white/50 text-[11px] font-medium mb-1">Poll Question</label>
+                    <input
+                      type="text"
+                      placeholder="What project or content should I build next? 📊"
+                      value={settings.poll_question || ''}
+                      onChange={(e) => handleChange('poll_question', e.target.value)}
+                      className="w-full px-3 py-1.5 rounded-lg glass text-xs text-white placeholder-white/30 font-semibold"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <label className="block text-white/50 text-[11px] font-medium">Poll Choices &amp; Vote Counters</label>
+                      <button
+                        type="button"
+                        onClick={handleResetPollVotes}
+                        className="text-[10px] text-red-400 hover:text-red-300 font-mono hover:underline"
+                      >
+                        Reset All Votes (0)
+                      </button>
+                    </div>
+
+                    {(settings.poll_options || [
+                      { id: '1', text: 'More 3D Creative Web Experiments 🚀', votes: 42 },
+                      { id: '2', text: 'Behind-the-scenes Vlog & Photography 📸', votes: 28 },
+                      { id: '3', text: 'Interactive Digital Design Tutorials 💡', votes: 35 },
+                      { id: '4', text: 'Open-Source Next.js Starters & Templates ⚡', votes: 51 },
+                    ]).map((opt, idx) => (
+                      <div key={opt.id || idx} className="flex items-center gap-2">
+                        <span className="w-5 text-center text-xs font-mono text-white/40 font-bold">{idx + 1}.</span>
+                        <input
+                          type="text"
+                          value={opt.text}
+                          onChange={(e) => handlePollOptionChange(idx, e.target.value)}
+                          className="flex-1 px-3 py-1.5 rounded-lg glass text-xs text-white placeholder-white/30"
+                        />
+                        <span className="px-2.5 py-1 rounded-lg bg-orange-500/10 border border-orange-500/20 text-orange-400 text-xs font-mono shrink-0">
+                          {opt.votes || 0} votes
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* 4. Sensory & Micro-Interactions (Apple & Cyber Haptics) */}
+            <div className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.06] space-y-4">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-purple-500/20 text-purple-400 flex items-center justify-center">
+                  <Volume2 size={16} />
+                </div>
+                <div>
+                  <h3 className="text-white text-sm font-semibold">✨ Sensory Micro-Interactions &amp; Ambient Feel</h3>
+                  <p className="text-white/40 text-xs">Audio haptic synthesis, live clock/weather badge, neon mouse trail, and color switcher</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-white/[0.04]">
+                {/* Sound Effects */}
+                <div className="p-3 rounded-xl bg-white/[0.02] border border-white/[0.06] flex items-center justify-between">
+                  <div>
+                    <p className="text-white text-xs font-medium flex items-center gap-1.5">
+                      <Volume2 size={13} className="text-orange-400" />
+                      <span>Subtle Sound Effects</span>
+                    </p>
+                    <p className="text-white/40 text-[10px]">Apple-style micro clicks &amp; chimes</p>
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={settings.sound_effects_enabled !== false}
+                    onChange={(e) => handleChange('sound_effects_enabled', e.target.checked)}
+                    className="w-4 h-4 rounded text-orange-500 bg-white/10 border-white/20 focus:ring-orange-500"
+                  />
+                </div>
+
+                {/* Cursor Neon Glow Trail */}
+                <div className="p-3 rounded-xl bg-white/[0.02] border border-white/[0.06] flex items-center justify-between">
+                  <div>
+                    <p className="text-white text-xs font-medium flex items-center gap-1.5">
+                      <Sparkles size={13} className="text-orange-400" />
+                      <span>Neon Mouse Trail &amp; Ripple</span>
+                    </p>
+                    <p className="text-white/40 text-[10px]">60fps glowing particle follower</p>
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={settings.cursor_effects_enabled !== false}
+                    onChange={(e) => handleChange('cursor_effects_enabled', e.target.checked)}
+                    className="w-4 h-4 rounded text-orange-500 bg-white/10 border-white/20 focus:ring-orange-500"
+                  />
+                </div>
+
+                {/* Theme Switcher */}
+                <div className="p-3 rounded-xl bg-white/[0.02] border border-white/[0.06] flex items-center justify-between">
+                  <div>
+                    <p className="text-white text-xs font-medium flex items-center gap-1.5">
+                      <Palette size={13} className="text-purple-400" />
+                      <span>Quick Color Mood Switcher</span>
+                    </p>
+                    <p className="text-white/40 text-[10px]">Visitor live palette selector</p>
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={settings.theme_switcher_enabled !== false}
+                    onChange={(e) => handleChange('theme_switcher_enabled', e.target.checked)}
+                    className="w-4 h-4 rounded text-orange-500 bg-white/10 border-white/20 focus:ring-orange-500"
+                  />
+                </div>
+
+                {/* Weather & Time Widget */}
+                <div className="p-3 rounded-xl bg-white/[0.02] border border-white/[0.06] flex items-center justify-between">
+                  <div>
+                    <p className="text-white text-xs font-medium flex items-center gap-1.5">
+                      <Clock size={13} className="text-emerald-400" />
+                      <span>Time &amp; Weather Widget</span>
+                    </p>
+                    <p className="text-white/40 text-[10px]">Live ticking clock &amp; temperature</p>
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={settings.weather_widget_enabled !== false}
+                    onChange={(e) => handleChange('weather_widget_enabled', e.target.checked)}
+                    className="w-4 h-4 rounded text-orange-500 bg-white/10 border-white/20 focus:ring-orange-500"
+                  />
+                </div>
+              </div>
+
+              {settings.weather_widget_enabled !== false && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                  <div>
+                    <label className="block text-white/50 text-[11px] font-medium mb-1">Weather Location Name</label>
+                    <input
+                      type="text"
+                      placeholder="Dhaka, BD"
+                      value={settings.weather_location_name || ''}
+                      onChange={(e) => handleChange('weather_location_name', e.target.value)}
+                      className="w-full px-3 py-1.5 rounded-lg glass text-xs text-white placeholder-white/30"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-white/50 text-[11px] font-medium mb-1">Timezone Identifier</label>
+                    <input
+                      type="text"
+                      placeholder="Asia/Dhaka"
+                      value={settings.weather_timezone || ''}
+                      onChange={(e) => handleChange('weather_timezone', e.target.value)}
+                      className="w-full px-3 py-1.5 rounded-lg glass text-xs text-white placeholder-white/30 font-mono"
+                    />
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -1509,6 +1879,13 @@ export default function AdminSettingsPage() {
           </div>
         </form>
       </div>
+
+      {/* 1-Click Instagram Story Card Modal */}
+      <MasterStoryCardModal
+        isOpen={storyModalOpen}
+        onClose={() => setStoryModalOpen(false)}
+        settings={settings}
+      />
     </div>
   )
 }

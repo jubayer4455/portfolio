@@ -8,6 +8,8 @@ import { ArrowDown, Share2, Sparkles, CheckCircle2, MapPin, Compass, Image as Im
 import type { SiteSettingsData, SocialProfileData } from '@/lib/content-store'
 import PlatformIcon from '@/components/common/PlatformIcon'
 import ShareProfileModal from '@/components/common/ShareProfileModal'
+import WeatherTimeWidget from '@/components/common/WeatherTimeWidget'
+import VoiceIntroPlayer from '@/components/interactive/VoiceIntroPlayer'
 
 const Scene3D = dynamic(() => import('./Scene3D'), {
   ssr: false,
@@ -130,13 +132,23 @@ export default function HeroSection({ settings, socials }: HeroSectionProps) {
               )}
             </motion.div>
 
-            {/* Location & Official Badge */}
+            {/* Location & Real-Time Weather Widget */}
             <motion.div
               variants={prefersReducedMotion ? {} : itemVariants}
-              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full glass border border-orange-500/20 text-orange-400 text-xs font-semibold mb-4"
+              className="mb-4"
             >
-              <MapPin size={13} className="text-orange-400" />
-              <span>{location}</span>
+              {settings?.weather_widget_enabled !== false ? (
+                <WeatherTimeWidget
+                  enabled={true}
+                  locationName={settings?.weather_location_name || location}
+                  timezone={settings?.weather_timezone || 'Asia/Dhaka'}
+                />
+              ) : (
+                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full glass border border-orange-500/20 text-orange-400 text-xs font-semibold">
+                  <MapPin size={13} className="text-orange-400" />
+                  <span>{location}</span>
+                </div>
+              )}
             </motion.div>
 
             {/* Main Name Heading */}
@@ -167,7 +179,7 @@ export default function HeroSection({ settings, socials }: HeroSectionProps) {
             {/* Primary Action Buttons */}
             <motion.div
               variants={prefersReducedMotion ? {} : itemVariants}
-              className="flex flex-wrap gap-3 justify-center mb-10 w-full sm:w-auto"
+              className="flex flex-wrap gap-3 justify-center mb-6 w-full sm:w-auto"
             >
               <button
                 onClick={() => scrollToSection('social')}
@@ -202,6 +214,21 @@ export default function HeroSection({ settings, socials }: HeroSectionProps) {
                 <UserCheck size={16} />
               </a>
             </motion.div>
+
+            {/* Voice Greeting Player */}
+            {settings?.voice_intro_enabled !== false && (
+              <motion.div
+                variants={prefersReducedMotion ? {} : itemVariants}
+                className="w-full max-w-md mb-8"
+              >
+                <VoiceIntroPlayer
+                  enabled={true}
+                  title={settings?.voice_intro_title || 'Listen to my Voice Greeting 🎙️'}
+                  audioUrl={settings?.voice_intro_url}
+                  authorName={fullName}
+                />
+              </motion.div>
+            )}
 
             {/* Social shortcut icon pills */}
             <motion.div

@@ -26,6 +26,13 @@ import UserAnonymousBox from '@/components/bio/UserAnonymousBox'
 import BioMiniMusicPlayer from '@/components/bio/BioMiniMusicPlayer'
 import BioWhatsAppDialog from '@/components/bio/BioWhatsAppDialog'
 import BioQrModal from '@/components/bio/BioQrModal'
+import SoundToggle from '@/components/common/SoundToggle'
+import ThemeSwitcher from '@/components/common/ThemeSwitcher'
+import CursorNeonTrail from '@/components/common/CursorNeonTrail'
+import WeatherTimeWidget from '@/components/common/WeatherTimeWidget'
+import VoiceIntroPlayer from '@/components/interactive/VoiceIntroPlayer'
+import MediaEmbedCard from '@/components/interactive/MediaEmbedCard'
+import InteractivePollCard from '@/components/interactive/InteractivePollCard'
 import type { UserBioData } from '@/lib/builder-store'
 
 interface Props {
@@ -184,6 +191,9 @@ export default function UserBioClientView({ bio }: Props) {
 
   return (
     <div className={`min-h-screen bg-[#070707] text-white relative flex flex-col justify-between selection:bg-orange-500 selection:text-white ${fontClass}`}>
+      {/* Neon Cursor Particles */}
+      <CursorNeonTrail enabled={true} />
+
       {/* Dynamic 3D Interactive Canvas Background */}
       <Bio3DBackground style={bio.bg_3d_style || 'particles'} glowColor={themeConfig.glow} />
 
@@ -209,14 +219,17 @@ export default function UserBioClientView({ bio }: Props) {
             <span>Platform</span>
           </Link>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <SoundToggle />
+            <ThemeSwitcher enabled={true} />
+
             <button
               onClick={() => setShowQr(true)}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-full glass border border-white/10 text-xs text-white/80 hover:text-white hover:border-white/20 transition-all active:scale-95 shadow-md"
               title="Show Digital QR Code"
             >
               <QrCode size={13} className="text-orange-400" />
-              <span>QR Code</span>
+              <span>QR</span>
             </button>
 
             <button
@@ -246,6 +259,52 @@ export default function UserBioClientView({ bio }: Props) {
           savedContact={savedContact}
           onSaveContact={handleSaveContact}
         />
+
+        {/* Real-Time Clock & Weather Badge */}
+        {bio.weather_enabled !== false && (
+          <div className="flex justify-center mb-4 sm:mb-5">
+            <WeatherTimeWidget
+              enabled={true}
+              locationName={bio.weather_location || bio.location || 'Dhaka, BD'}
+            />
+          </div>
+        )}
+
+        {/* Voice Greeting Player */}
+        {bio.voice_intro_enabled && (
+          <div className="mb-5 sm:mb-6">
+            <VoiceIntroPlayer
+              enabled={true}
+              title={bio.voice_intro_title || 'Listen to my Voice Greeting 🎙️'}
+              audioUrl={bio.voice_intro_url}
+              authorName={bio.display_name}
+            />
+          </div>
+        )}
+
+        {/* Live Media Embed (YouTube / Spotify) */}
+        {bio.media_embed_enabled && bio.media_embed_url && (
+          <div className="mb-5 sm:mb-6">
+            <MediaEmbedCard
+              enabled={true}
+              type={bio.media_embed_type || 'youtube'}
+              url={bio.media_embed_url}
+              title={bio.media_embed_title || 'Featured Visual 📺'}
+            />
+          </div>
+        )}
+
+        {/* Community Poll Widget */}
+        {bio.poll_enabled && bio.poll_question && (
+          <div className="mb-5 sm:mb-6">
+            <InteractivePollCard
+              enabled={true}
+              question={bio.poll_question}
+              options={bio.poll_options}
+              pollId={`poll_bio_${bio.username}`}
+            />
+          </div>
+        )}
 
         {/* 2. 4 Personal Photos Showcase */}
         {bio.photos && bio.photos.length > 0 && (
