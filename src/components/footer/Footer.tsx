@@ -26,8 +26,8 @@ export default function Footer({ settings, socials }: FooterProps) {
   const firstName = settings?.first_name || 'Abdul Al'
   const lastName = settings?.last_name || 'Jubayer'
   const fullName = `${firstName} ${lastName}`.trim()
-  const initials = 'AJ'
-  const contactEmail = settings?.contact_email || 'hello@jubayer.me'
+  const initials = `${(firstName[0] || 'A')}${(lastName[0] || 'J')}`.toUpperCase()
+  const contactEmail = settings?.contact_email || 'jubayerahmmed2k@gmail.com'
   const tagline = settings?.tagline || 'Visual creator & lifestyle storyteller sharing moments and connecting with inspiring minds.'
 
   const activeSocials = (socials && socials.length > 0)

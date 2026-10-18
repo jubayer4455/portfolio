@@ -32,35 +32,40 @@ interface Props {
   bio: UserBioData
 }
 
-const THEME_ACCENTS: Record<string, { glow: string; border: string; text: string; bg: string }> = {
+const THEME_ACCENTS: Record<string, { glow: string; border: string; text: string; bg: string; hoverText: string }> = {
   orange: {
     glow: 'rgba(249,115,22,0.18)',
     border: 'border-orange-500/30',
     text: 'text-orange-400',
+    hoverText: 'group-hover:text-orange-400',
     bg: 'bg-orange-500',
   },
   purple: {
     glow: 'rgba(168,85,247,0.18)',
     border: 'border-purple-500/30',
     text: 'text-purple-400',
+    hoverText: 'group-hover:text-purple-400',
     bg: 'bg-purple-500',
   },
   cyan: {
     glow: 'rgba(6,182,212,0.18)',
     border: 'border-cyan-500/30',
     text: 'text-cyan-400',
+    hoverText: 'group-hover:text-cyan-400',
     bg: 'bg-cyan-500',
   },
   emerald: {
     glow: 'rgba(16,185,129,0.18)',
     border: 'border-emerald-500/30',
     text: 'text-emerald-400',
+    hoverText: 'group-hover:text-emerald-400',
     bg: 'bg-emerald-500',
   },
   rose: {
     glow: 'rgba(244,63,94,0.18)',
     border: 'border-rose-500/30',
     text: 'text-rose-400',
+    hoverText: 'group-hover:text-rose-400',
     bg: 'bg-rose-500',
   },
 }
@@ -320,7 +325,7 @@ export default function UserBioClientView({ bio }: Props) {
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={() => handleLinkClick(link.platform, link.profile_url)}
-                      className={`group p-4 rounded-2xl glass border border-white/10 hover:border-orange-500/40 hover:bg-white/[0.06] transition-all duration-300 shadow-md flex flex-col justify-between ${
+                      className={`group p-4 rounded-2xl glass border border-white/10 hover:bg-white/[0.06] transition-all duration-300 shadow-md flex flex-col justify-between hover:scale-[1.02] active:scale-[0.98] ${
                         isFeaturedTile ? 'col-span-2 aspect-[3/1]' : 'aspect-square'
                       }`}
                     >
@@ -332,7 +337,7 @@ export default function UserBioClientView({ bio }: Props) {
                       </div>
 
                       <div>
-                        <p className="text-sm font-bold text-white group-hover:text-orange-400 transition-colors truncate">
+                        <p className={`text-sm font-bold text-white ${themeConfig.hoverText} transition-colors truncate`}>
                           {link.display_label || link.platform}
                         </p>
                         <p className="text-[11px] text-white/40 font-mono truncate">{link.platform}</p>
@@ -351,14 +356,14 @@ export default function UserBioClientView({ bio }: Props) {
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={() => handleLinkClick(link.platform, link.profile_url)}
-                    className="group w-full flex items-center justify-between p-4 rounded-2xl glass border border-white/10 hover:border-white/25 hover:bg-white/[0.06] transition-all duration-300 shadow-md hover:scale-[1.01]"
+                    className="group w-full flex items-center justify-between p-4 rounded-2xl glass border border-white/10 hover:border-white/25 hover:bg-white/[0.06] transition-all duration-300 shadow-md hover:scale-[1.01] active:scale-[0.99]"
                   >
                     <div className="flex items-center gap-3.5 min-w-0">
-                      <div className="w-10 h-10 rounded-xl bg-white/[0.05] border border-white/10 flex items-center justify-center flex-shrink-0 group-hover:border-orange-500/40 transition-colors">
+                      <div className="w-10 h-10 rounded-xl bg-white/[0.05] border border-white/10 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
                         <PlatformIcon platform={link.platform} size={20} />
                       </div>
                       <div className="min-w-0 text-left">
-                        <p className="text-sm font-semibold text-white truncate group-hover:text-orange-300 transition-colors">
+                        <p className={`text-sm font-semibold text-white truncate ${themeConfig.hoverText} transition-colors`}>
                           {link.display_label || link.platform}
                         </p>
                         <p className="text-[11px] text-white/40 truncate">{link.platform}</p>

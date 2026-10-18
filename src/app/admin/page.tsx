@@ -50,15 +50,25 @@ interface StatCardProps {
 
 function StatCard({ label, value, sub, icon, color }: StatCardProps) {
   return (
-    <div className="glass gradient-border rounded-2xl p-5 flex items-center gap-4 transition-transform hover:-translate-y-0.5">
+    <div
+      className="group glass gradient-border rounded-2xl p-5 flex items-center gap-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg relative overflow-hidden"
+      aria-label={`${label}: ${value}`}
+      role="status"
+      style={{ backgroundImage: `linear-gradient(135deg, ${color}08 0%, transparent 60%)` }}
+    >
+      {/* Animated gradient border glow on hover */}
       <div
-        className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
+        className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+        style={{ boxShadow: `inset 0 0 0 1px ${color}40, 0 4px 20px ${color}15` }}
+      />
+      <div
+        className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 transition-transform duration-300 group-hover:scale-110"
         style={{ backgroundColor: `${color}20`, border: `1px solid ${color}30` }}
       >
         <div style={{ color }}>{icon}</div>
       </div>
-      <div className="min-w-0">
-        <p className="text-2xl font-bold text-white font-mono">{value}</p>
+      <div className="min-w-0 relative z-10">
+        <p className="text-3xl font-extrabold text-white font-mono tracking-tight" style={{ fontFeatureSettings: '"tnum"' }}>{value}</p>
         <p className="text-white/40 text-xs truncate mt-0.5">{label}</p>
         {sub && <p className="text-[10px] text-emerald-400 font-mono mt-0.5">{sub}</p>}
       </div>
@@ -135,7 +145,7 @@ export default async function AdminDashboard() {
   const maxClicks = Math.max(...topClickedSocials.map((s) => s.click_count || 1), 1)
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-10">
       {/* Super Admin Welcome Banner */}
       <div className="glass gradient-border rounded-3xl p-6 sm:p-8 relative overflow-hidden shadow-2xl">
         <div className="absolute top-0 right-0 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -146,7 +156,7 @@ export default async function AdminDashboard() {
               <span>MASTER PLATFORM COMMAND CENTER</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-bold font-display text-white tracking-tight">
-              Welcome back, <span className="text-gradient">Abdul Al Jubayer</span>
+              Welcome back, <span className="text-gradient">{settings?.first_name ? `${settings.first_name} ${settings.last_name || ''}`.trim() : 'Abdul Al Jubayer'}</span>
             </h1>
             <p className="text-white/50 text-xs sm:text-sm mt-1.5 max-w-xl leading-relaxed">
               Real-time platform intelligence, creator moderation, global announcements, and traffic telemetry.

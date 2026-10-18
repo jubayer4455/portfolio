@@ -82,16 +82,36 @@ function getServiceSupabase() {
   }
 }
 
+let cachedBios: UserBioData[] | null = null
+let cachedBiosTimestamp = 0
+const BIOS_CACHE_TTL = 3000
+
+export function invalidateBiosCache() {
+  cachedBios = null
+  cachedBiosTimestamp = 0
+}
+
 // ── USER BIOS STORAGE ─────────────────────────────────────────
 export function readAllUserBios(): UserBioData[] {
+  const now = Date.now()
+  if (cachedBios && (now - cachedBiosTimestamp) < BIOS_CACHE_TTL) {
+    return cachedBios
+  }
+
   try {
     if (fs.existsSync(tmpUserBiosPath)) {
       const data = fs.readFileSync(tmpUserBiosPath, 'utf8')
-      return JSON.parse(data) as UserBioData[]
+      const parsed = JSON.parse(data) as UserBioData[]
+      cachedBios = parsed
+      cachedBiosTimestamp = now
+      return parsed
     }
     if (fs.existsSync(userBiosPath)) {
       const data = fs.readFileSync(userBiosPath, 'utf8')
-      return JSON.parse(data) as UserBioData[]
+      const parsed = JSON.parse(data) as UserBioData[]
+      cachedBios = parsed
+      cachedBiosTimestamp = now
+      return parsed
     }
   } catch (err) {
     console.error('Error reading user-bios.json:', err)
@@ -100,6 +120,7 @@ export function readAllUserBios(): UserBioData[] {
 }
 
 export function writeAllUserBios(bios: UserBioData[]): boolean {
+  invalidateBiosCache()
   try {
     const dir = path.dirname(userBiosPath)
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true })

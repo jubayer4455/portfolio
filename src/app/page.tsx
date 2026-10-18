@@ -70,7 +70,9 @@ export default async function HomePage() {
         Skip to main content
       </a>
       <VisitTracker />
-      <Navigation settings={settings} />
+      <div className={settings.maintenance_mode_enabled && isAdmin ? 'pt-8' : ''}>
+        <Navigation settings={settings} />
+      </div>
       <main id="main-content">
         <HeroSection settings={settings} socials={socials} />
 

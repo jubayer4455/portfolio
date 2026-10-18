@@ -75,7 +75,7 @@ export default function AdminSidebar({ userEmail }: AdminSidebarProps) {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-4 space-y-1.5">
+      <nav className="flex-1 p-4 space-y-1">
         {sidebarLinks.map(({ label, href, Icon }) => {
           const isActive = pathname === href
           return (
@@ -83,13 +83,16 @@ export default function AdminSidebar({ userEmail }: AdminSidebarProps) {
               key={href}
               href={href}
               onClick={() => setMobileOpen(false)}
-              className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
+              className={`group relative flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
                 isActive
-                  ? 'bg-orange-500/10 border border-orange-500/20 text-orange-400'
-                  : 'text-white/60 hover:text-white hover:bg-white/5 border border-transparent'
+                  ? 'bg-orange-500/10 border border-orange-500/20 text-orange-400 shadow-sm shadow-orange-500/5'
+                  : 'text-white/60 hover:text-white hover:bg-white/[0.04] border border-transparent hover:translate-x-1'
               }`}
             >
-              <Icon size={16} className={isActive ? 'text-orange-400' : 'text-white/40 group-hover:text-white'} />
+              {isActive && (
+                <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-orange-500 rounded-full shadow-sm shadow-orange-500/50" />
+              )}
+              <Icon size={16} className={`transition-colors duration-200 ${isActive ? 'text-orange-400' : 'text-white/40 group-hover:text-orange-400/70'}`} />
               <span>{label}</span>
             </Link>
           )
@@ -99,9 +102,9 @@ export default function AdminSidebar({ userEmail }: AdminSidebarProps) {
           <Link
             href="/"
             target="_blank"
-            className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-white/50 hover:text-orange-400 hover:bg-white/5 transition-all duration-200"
+            className="group flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-white/50 hover:text-orange-400 hover:bg-white/[0.04] hover:translate-x-1 transition-all duration-200"
           >
-            <ExternalLink size={16} />
+            <ExternalLink size={16} className="transition-colors duration-200 group-hover:text-orange-400" />
             <span>View Public Site</span>
           </Link>
         </div>

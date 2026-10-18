@@ -51,6 +51,7 @@ function SocialCard({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: platform.id, platform: name }),
+        keepalive: true,
       })
     } catch {}
   }
@@ -104,7 +105,7 @@ function SocialCard({
         <h3 className="text-white font-semibold text-sm group-hover:text-white transition-colors">
           {name}
         </h3>
-        <p className="text-white/40 text-xs mt-0.5 truncate font-light">
+        <p className="text-white/65 text-xs mt-0.5 truncate font-normal">
           {handle}
         </p>
       </div>

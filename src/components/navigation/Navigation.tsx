@@ -21,10 +21,21 @@ export default function Navigation({ settings }: { settings?: SiteSettingsData }
   const firstName = settings?.first_name || 'Abdul Al'
   const lastName = settings?.last_name || 'Jubayer'
   const fullName = `${firstName} ${lastName}`.trim()
-  const initials = 'AJ'
+  const initials = `${(firstName[0] || 'A')}${(lastName[0] || 'J')}`.toUpperCase()
   const [isScrolled, setIsScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [activeSection, setActiveSection] = useState('home')
+
+  const dynamicNavLinks = navLinks.filter((l) => {
+    if (l.href === '/#projects') return settings?.projects_enabled !== false
+    if (l.href === '/#social') return settings?.socials_enabled !== false
+    if (l.href === '/#gallery') return settings?.gallery_enabled !== false
+    if (l.href === '/#reviews') return settings?.reviews_enabled !== false
+    if (l.href === '/#faq') return settings?.faq_enabled !== false
+    if (l.href === '/#about') return settings?.about_enabled !== false
+    if (l.href === '/#contact') return settings?.contact_enabled !== false
+    return true
+  })
 
   useEffect(() => {
     let ticking = false
@@ -115,7 +126,7 @@ export default function Navigation({ settings }: { settings?: SiteSettingsData }
 
           {/* Desktop nav */}
           <ul className="hidden md:flex items-center gap-1" role="list">
-            {navLinks.map((link) => (
+            {dynamicNavLinks.map((link) => (
               <li key={link.href}>
                 <a
                   href={link.href}
@@ -197,7 +208,7 @@ export default function Navigation({ settings }: { settings?: SiteSettingsData }
               className="md:hidden overflow-hidden border-t border-white/[0.06]"
             >
               <div className="glass px-4 py-4 flex flex-col gap-1">
-                {navLinks.map((link, i) => (
+                {dynamicNavLinks.map((link, i) => (
                   <motion.a
                     key={link.href}
                     href={link.href}

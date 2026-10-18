@@ -133,15 +133,35 @@ function getServiceSupabase() {
   }
 }
 
+let cachedContent: FullSiteContent | null = null
+let cachedContentTimestamp = 0
+const CACHE_TTL_MS = 3000 // 3 seconds in-memory cache
+
+export function invalidateContentCache() {
+  cachedContent = null
+  cachedContentTimestamp = 0
+}
+
 export function readContentFile(): FullSiteContent {
+  const now = Date.now()
+  if (cachedContent && (now - cachedContentTimestamp) < CACHE_TTL_MS) {
+    return cachedContent
+  }
+
   try {
     if (fs.existsSync(tmpDataPath)) {
       const fileData = fs.readFileSync(tmpDataPath, 'utf8')
-      return JSON.parse(fileData) as FullSiteContent
+      const parsed = JSON.parse(fileData) as FullSiteContent
+      cachedContent = parsed
+      cachedContentTimestamp = now
+      return parsed
     }
     if (fs.existsSync(dataFilePath)) {
       const fileData = fs.readFileSync(dataFilePath, 'utf8')
-      return JSON.parse(fileData) as FullSiteContent
+      const parsed = JSON.parse(fileData) as FullSiteContent
+      cachedContent = parsed
+      cachedContentTimestamp = now
+      return parsed
     }
   } catch (err) {
     console.error('Error reading site-content.json:', err)
@@ -180,6 +200,7 @@ export function readContentFile(): FullSiteContent {
 }
 
 export function writeContentFile(content: FullSiteContent): boolean {
+  invalidateContentCache()
   try {
     const dir = path.dirname(dataFilePath)
     if (!fs.existsSync(dir)) {
