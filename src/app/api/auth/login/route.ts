@@ -33,10 +33,17 @@ export async function POST(req: NextRequest) {
     const cookieStore = await cookies()
 
     // 1. Check Master Admin Credentials
-    if (identifier === 'admin@portfolio.com' || identifier === 'admin') {
+    const isMasterAdmin =
+      identifier === 'jubayerahmmed2k@gmail.com' ||
+      identifier === 'jubayer'
+
+    if (isMasterAdmin) {
       const isValidAdmin = await verifyAdminPassword(password)
       if (isValidAdmin) {
         cookieStore.set('demo_admin', 'true', { path: '/', maxAge: 60 * 60 * 24 * 7 })
+        cookieStore.set('user_session_id', '3c04c4e0-1653-4037-af3b-32b7c5c36a16', { path: '/', maxAge: 60 * 60 * 24 * 7 })
+        cookieStore.set('user_session_username', 'jubayer', { path: '/', maxAge: 60 * 60 * 24 * 7 })
+        cookieStore.set('user_session_email', 'jubayerahmmed2k@gmail.com', { path: '/', maxAge: 60 * 60 * 24 * 7 })
         return NextResponse.json({
           success: true,
           redirect: '/admin',

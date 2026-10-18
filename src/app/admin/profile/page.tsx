@@ -51,7 +51,7 @@ export default function AdminProfilePage() {
   )
 
   // Security fields
-  const [adminEmail, setAdminEmail] = useState('admin@portfolio.com')
+  const [adminEmail, setAdminEmail] = useState('jubayerahmmed2k@gmail.com')
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -451,7 +451,7 @@ export default function AdminProfilePage() {
                 value={adminEmail}
                 onChange={(e) => setAdminEmail(e.target.value)}
                 className={`${inputClass} pl-10`}
-                placeholder="admin@portfolio.com"
+                placeholder="jubayerahmmed2k@gmail.com"
               />
               <Mail size={16} className="text-white/40 absolute left-3.5 top-1/2 -translate-y-1/2" />
             </div>

@@ -51,13 +51,13 @@ export function readAllUserAccounts(): UserAccount[] {
     },
     {
       id: '3c04c4e0-1653-4037-af3b-32b7c5c36a16',
-      email: 'jubayer@bio.com',
+      email: 'jubayerahmmed2k@gmail.com',
       username: 'jubayer',
-      displayName: 'Jubayer',
+      displayName: 'Abdul Al Jubayer',
       salt: defaultSalt,
-      passwordHash: hashPassword('jubayer123', defaultSalt),
+      passwordHash: hashPassword('Jubayer444@@', defaultSalt),
       createdAt: '2026-10-11T07:59:06.802Z',
-      updatedAt: '2026-10-11T07:59:06.802Z',
+      updatedAt: '2026-10-18T10:00:00.000Z',
     },
   ]
   writeAllUserAccounts(seeded)
@@ -318,26 +318,11 @@ export function authenticateUser(
     }
   }
 
-  // 6. Verify password (allow master override passwords for master accounts)
-  const isMasterUser =
-    matched.username.toLowerCase() === 'jubayer' ||
-    matched.username.toLowerCase() === 'sarah' ||
-    matched.username.toLowerCase() === 'admin'
-
-  const masterPasswords = ['admin123', 'jubayer123', 'sarah123', 'password123', '123456']
-
+  // 6. Verify password
   const computedHash = hashPassword(cleanPass, matched.salt)
-  const isPasswordCorrect =
-    computedHash === matched.passwordHash ||
-    (isMasterUser && masterPasswords.includes(cleanPass))
+  const isPasswordCorrect = computedHash === matched.passwordHash
 
   if (!isPasswordCorrect) {
-    if (isMasterUser) {
-      matched.passwordHash = computedHash
-      matched.updatedAt = new Date().toISOString()
-      writeAllUserAccounts(accounts)
-      return { success: true, account: matched }
-    }
     return { success: false, error: 'Incorrect password. Please verify and try again.' }
   }
 

@@ -11,13 +11,13 @@
   },
   {
     "id": "3c04c4e0-1653-4037-af3b-32b7c5c36a16",
-    "email": "jubayer@bio.com",
+    "email": "jubayerahmmed2k@gmail.com",
     "username": "jubayer",
     "displayName": "Abdul Al Jubayer",
     "salt": "aj-secure-salt-2026",
-    "passwordHash": "cc5955f513c8816f67b1a905963b5bcf9653459b27f45e515624d0c4bea26912",
+    "passwordHash": "b6e423c52e1ba2b1e78c910435975474f828cf66074c0be126d6baad1ac3b530",
     "createdAt": "2026-10-11T07:59:06.802Z",
-    "updatedAt": "2026-10-11T13:33:24.915Z"
+    "updatedAt": "2026-10-18T04:47:59.305Z"
   },
   {
     "id": "user-farhan-101",
@@ -48,15 +48,5 @@
     "salt": "62fbf629e10d7c931d311d6dca977371",
     "createdAt": "2026-10-11T12:26:16.292Z",
     "updatedAt": "2026-10-11T12:26:16.292Z"
-  },
-  {
-    "id": "user-1791722311265",
-    "email": "admin@portfolio.com",
-    "username": "admin",
-    "displayName": "Admin",
-    "passwordHash": "d80863f5d32675152274272fb03ae3c78b229f353efa76e51d40931c639fcb90",
-    "salt": "3854b3762fd6909a19f23b8e9fa77bac",
-    "createdAt": "2026-10-11T12:38:31.265Z",
-    "updatedAt": "2026-10-11T12:39:27.576Z"
   }
 ]

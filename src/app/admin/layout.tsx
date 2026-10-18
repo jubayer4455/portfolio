@@ -20,8 +20,9 @@ export default async function AdminLayout({
 
   const cookieStore = cookies()
   const isDemo = cookieStore.get('demo_admin')?.value === 'true'
-  if (isDemo && !user) {
-    user = { email: 'admin@portfolio.com' } as any
+  const sessionEmail = cookieStore.get('user_session_email')?.value
+  if ((isDemo || sessionEmail === 'jubayerahmmed2k@gmail.com') && !user) {
+    user = { email: 'jubayerahmmed2k@gmail.com' } as any
   }
 
   if (!user) {
@@ -30,7 +31,7 @@ export default async function AdminLayout({
 
   return (
     <div className="min-h-screen bg-[#080808] flex flex-col md:flex-row">
-      <AdminSidebar userEmail={user.email || 'admin@portfolio.com'} />
+      <AdminSidebar userEmail={user.email || 'jubayerahmmed2k@gmail.com'} />
       <main className="flex-1 overflow-auto p-4 md:p-8 pt-20 md:pt-8 pb-24 md:pb-8 min-w-0">
         {children}
       </main>

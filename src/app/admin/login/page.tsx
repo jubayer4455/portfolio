@@ -2,8 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
-import { Mail, Lock, AlertCircle, Loader2, Eye, EyeOff, Sparkles } from 'lucide-react'
+import { Mail, Lock, AlertCircle, Loader2, Eye, EyeOff } from 'lucide-react'
 
 export default function AdminLoginPage() {
   const router = useRouter()
@@ -13,19 +12,13 @@ export default function AdminLoginPage() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const handleFillDemo = () => {
-    setEmail('admin@portfolio.com')
-    setPassword('admin123')
-    setError('')
-  }
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
 
     const cleanIdentifier = email.trim()
     if (!cleanIdentifier || !password.trim()) {
-      setError('Please enter your email/username and password.')
+      setError('Please enter your email and password.')
       return
     }
 
@@ -44,30 +37,16 @@ export default function AdminLoginPage() {
       const data = await res.json()
 
       if (!res.ok || data.error) {
-        // Fallback for direct local admin demo check
-        if ((cleanIdentifier === 'admin@portfolio.com' || cleanIdentifier === 'admin') && password === 'admin123') {
-          document.cookie = 'demo_admin=true; path=/; max-age=86400;'
-          router.push('/admin')
-          router.refresh()
-          return
-        }
-
-        setError(data.error || 'Invalid credentials.')
+        setError(data.error || 'Invalid email or password.')
         setLoading(false)
         return
       }
 
-      document.cookie = 'demo_admin=true; path=/; max-age=86400;'
-      router.push('/admin')
+      document.cookie = 'demo_admin=true; path=/; max-age=604800;'
+      router.push(data.redirect || '/admin')
       router.refresh()
     } catch {
-      if ((cleanIdentifier === 'admin@portfolio.com' || cleanIdentifier === 'admin') && password === 'admin123') {
-        document.cookie = 'demo_admin=true; path=/; max-age=86400;'
-        router.push('/admin')
-        router.refresh()
-        return
-      }
-      setError('Could not connect to authentication service. Try demo: admin@portfolio.com / admin123')
+      setError('Could not connect to authentication service. Please check your connection and try again.')
       setLoading(false)
     }
   }
@@ -92,35 +71,20 @@ export default function AdminLoginPage() {
             <p className="text-white/40 text-sm mt-1">Sign in to your bio admin panel</p>
           </div>
 
-          {/* Quick Demo Pill */}
-          <div className="mb-6 p-3 rounded-2xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-between text-xs">
-            <div className="flex items-center gap-2 text-orange-400">
-              <Sparkles size={14} />
-              <span>Local Demo Available</span>
-            </div>
-            <button
-              type="button"
-              onClick={handleFillDemo}
-              className="text-white font-medium bg-orange-500/30 hover:bg-orange-500/50 px-2.5 py-1 rounded-lg transition-colors"
-            >
-              Fill Demo Login
-            </button>
-          </div>
-
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Email or Username */}
             <div>
               <label htmlFor="email" className="block text-white/60 text-xs font-medium mb-2 uppercase tracking-wider">
-                Email Address or Username
+                Admin Email Address
               </label>
               <div className="relative">
                 <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/30" />
                 <input
                   id="email"
-                  type="text"
+                  type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@portfolio.com or admin"
+                  placeholder="jubayerahmmed2k@gmail.com"
                   autoCapitalize="none"
                   autoCorrect="off"
                   spellCheck="false"

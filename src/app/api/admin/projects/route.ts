@@ -23,7 +23,7 @@ async function checkAdminAuth() {
   const isDemo = cookieStore.get('demo_admin')?.value === 'true'
   const sessionUser = cookieStore.get('user_session_username')?.value
   const sessionEmail = cookieStore.get('user_session_email')?.value
-  if (isDemo || sessionUser === 'admin' || sessionEmail === 'admin@portfolio.com') return true
+  if (isDemo || sessionUser === 'jubayer' || sessionEmail === 'jubayerahmmed2k@gmail.com') return true
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co',
@@ -40,7 +40,7 @@ async function checkAdminAuth() {
 
   try {
     const { data: { user } } = await supabase.auth.getUser()
-    return !!user
+    return !!user && user.email?.toLowerCase() === 'jubayerahmmed2k@gmail.com'
   } catch {
     return false
   }

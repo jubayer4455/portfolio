@@ -1327,7 +1327,7 @@ export default function AdminSettingsPage() {
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
                 className={inputClass}
-                placeholder="Default: admin123"
+                placeholder="Enter current password"
               />
             </div>
 

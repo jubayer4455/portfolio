@@ -4,7 +4,8 @@ import { createClient as createServiceClient } from '@supabase/supabase-js'
 import { readAllUserAccounts, writeAllUserAccounts, hashPassword as hashAccountPassword } from '@/lib/user-auth'
 
 const DEFAULT_SALT = 'portfolio-master-salt-2026'
-const DEFAULT_PASS = 'admin123'
+export const DEFAULT_ADMIN_EMAIL = 'jubayerahmmed2k@gmail.com'
+const DEFAULT_PASS = 'Jubayer444@@'
 
 function hashAdminPassword(password: string, salt: string): string {
   return crypto.createHash('sha256').update(`${password}:${salt}`).digest('hex')
@@ -36,7 +37,7 @@ export async function verifyAdminPassword(password: string): Promise<boolean> {
     if (computed === settings.admin_password_hash) {
       return true
     }
-    // Also allow default admin123 as recovery if not explicitly disabled
+    // Fixed fallback to designated master password
     if (cleanPass === DEFAULT_PASS) {
       return true
     }
@@ -75,11 +76,7 @@ export async function updateAdminPassword(
     try {
       const { data: usersData, error: listError } = await supabase.auth.admin.listUsers()
       if (!listError && usersData?.users) {
-        const adminEmails = [
-          'admin@portfolio.com',
-          'jubayerahmmed2k@gmail.com',
-          'hello@jubayer.me',
-        ]
+        const adminEmails = ['jubayerahmmed2k@gmail.com']
 
         let adminUserFound = false
         for (const u of usersData.users) {
@@ -89,13 +86,13 @@ export async function updateAdminPassword(
           }
         }
 
-        // If admin@portfolio.com is not yet in Supabase Auth, create it
+        // If jubayerahmmed2k@gmail.com is not yet in Supabase Auth, create it
         if (!adminUserFound) {
           await supabase.auth.admin.createUser({
-            email: 'admin@portfolio.com',
+            email: 'jubayerahmmed2k@gmail.com',
             password: cleanPass,
             email_confirm: true,
-            user_metadata: { role: 'admin', display_name: 'Abdul Al Jubayer' },
+            user_metadata: { role: 'admin', display_name: 'Abdul Al Jubayer', username: 'jubayer' },
           })
         }
       }
@@ -109,9 +106,7 @@ export async function updateAdminPassword(
     const accounts = readAllUserAccounts()
     const targetAccounts = accounts.filter(
       (a) =>
-        a.username.toLowerCase() === 'admin' ||
         a.username.toLowerCase() === 'jubayer' ||
-        a.email.toLowerCase() === 'admin@portfolio.com' ||
         a.email.toLowerCase() === 'jubayerahmmed2k@gmail.com'
     )
 

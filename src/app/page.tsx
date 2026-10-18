@@ -42,9 +42,7 @@ export default async function HomePage() {
   const sessionEmail = cookieStore.get('user_session_email')?.value
   const isAdmin =
     isDemoAdmin ||
-    sessionUser === 'admin' ||
     sessionUser === 'jubayer' ||
-    sessionEmail === 'admin@portfolio.com' ||
     sessionEmail === 'jubayerahmmed2k@gmail.com'
 
   // If maintenance mode is active and user is NOT admin, show maintenance screen

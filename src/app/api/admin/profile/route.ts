@@ -77,8 +77,8 @@ export async function POST(req: NextRequest) {
         // List users to find the admin user
         const { data: usersData } = await supabase.auth.admin.listUsers()
         const adminUser = usersData?.users?.find(
-          (u) => u.email === 'admin@portfolio.com' || (new_email && u.email === new_email)
-        ) || usersData?.users?.[0]
+          (u) => u.email?.toLowerCase() === 'jubayerahmmed2k@gmail.com' || (new_email && u.email?.toLowerCase() === new_email.toLowerCase())
+        )
 
         if (adminUser) {
           const updateData: { email?: string; password?: string } = {}

@@ -14,11 +14,11 @@ export async function middleware(request: NextRequest) {
       return supabaseResponse
     }
 
-    // Allow master admin cookie during local development/auth
+    // Allow master admin session during auth
     const demoAdmin = request.cookies.get('demo_admin')?.value === 'true'
     const sessionUser = request.cookies.get('user_session_username')?.value
     const sessionEmail = request.cookies.get('user_session_email')?.value
-    if (demoAdmin || sessionUser === 'admin' || sessionEmail === 'admin@portfolio.com') {
+    if (demoAdmin || sessionUser === 'jubayer' || sessionEmail === 'jubayerahmmed2k@gmail.com') {
       return supabaseResponse
     }
 
@@ -36,7 +36,7 @@ export async function middleware(request: NextRequest) {
       //
     }
 
-    if (!user) {
+    if (!user || user.email?.toLowerCase() !== 'jubayerahmmed2k@gmail.com') {
       const loginUrl = new URL('/admin/login', request.url)
       loginUrl.searchParams.set('redirectTo', pathname)
       return NextResponse.redirect(loginUrl)

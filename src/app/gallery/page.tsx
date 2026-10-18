@@ -182,9 +182,7 @@ export default async function GalleryPage() {
   const sessionEmail = cookieStore.get('user_session_email')?.value
   const isAdmin =
     isDemoAdmin ||
-    sessionUser === 'admin' ||
     sessionUser === 'jubayer' ||
-    sessionEmail === 'admin@portfolio.com' ||
     sessionEmail === 'jubayerahmmed2k@gmail.com'
 
   if (settings.maintenance_mode_enabled && !isAdmin) {

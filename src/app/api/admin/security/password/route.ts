@@ -13,9 +13,7 @@ export async function POST(req: NextRequest) {
 
     const isAuthenticated =
       isDemoAdmin ||
-      sessionUser === 'admin' ||
       sessionUser === 'jubayer' ||
-      sessionEmail === 'admin@portfolio.com' ||
       sessionEmail === 'jubayerahmmed2k@gmail.com'
 
     if (!isAuthenticated) {
@@ -53,7 +51,7 @@ export async function POST(req: NextRequest) {
     const isCurrentValid = await verifyAdminPassword(currentPassword)
     if (!isCurrentValid) {
       return NextResponse.json(
-        { error: 'Current password is incorrect. If you haven\'t changed it yet, default is admin123.' },
+        { error: 'Current password is incorrect. Please enter your valid admin password.' },
         { status: 400 }
       )
     }
