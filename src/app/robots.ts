@@ -1,6 +1,7 @@
 import type { MetadataRoute } from 'next'
+import { getCanonicalSiteUrl } from '@/lib/seo-engine'
 
-const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://hellojubayer.online'
+const baseUrl = getCanonicalSiteUrl()
 
 export default function robots(): MetadataRoute.Robots {
   return {

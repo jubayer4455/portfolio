@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getGalleryItems, getSiteSettings } from '@/lib/content-store'
 import { readAllUserBios } from '@/lib/builder-store'
+import { getCanonicalSiteUrl } from '@/lib/seo-engine'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 3600
@@ -19,7 +20,7 @@ function escapeXml(unsafe: string): string {
 }
 
 export async function GET() {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://hellojubayer.online'
+  const baseUrl = getCanonicalSiteUrl()
 
   let settings: any = null
   let galleryItems: any[] = []

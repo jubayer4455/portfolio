@@ -3,7 +3,7 @@ import { Inter, Playfair_Display } from 'next/font/google'
 import { Suspense } from 'react'
 import './globals.css'
 import { getSiteSettings, getGalleryItems } from '@/lib/content-store'
-import { generateMainSiteSchema } from '@/lib/seo-engine'
+import { generateMainSiteSchema, getCanonicalSiteUrl } from '@/lib/seo-engine'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -18,7 +18,7 @@ const playfair = Playfair_Display({
   weight: ['400', '700', '900'],
 })
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+const siteUrl = getCanonicalSiteUrl()
 
 export const viewport: Viewport = {
   themeColor: '#0a0a0a',

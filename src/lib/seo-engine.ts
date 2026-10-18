@@ -7,6 +7,14 @@
  * - Guarantees that future photos added by admin or users are 100% automatically SEO-optimized
  */
 
+export function getCanonicalSiteUrl(): string {
+  const envUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim()
+  if (envUrl && !envUrl.includes('localhost') && !envUrl.includes('127.0.0.1') && envUrl.startsWith('http')) {
+    return envUrl.replace(/\/+$/, '')
+  }
+  return 'https://hellojubayer.online'
+}
+
 export interface PhotoSeoInput {
   title?: string
   caption?: string
@@ -210,7 +218,7 @@ export function generateImageObjectSchema(params: {
   uploadDate?: string
 }) {
   const author = params.authorName || DEFAULT_AUTHOR
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://hellojubayer.online'
+  const siteUrl = getCanonicalSiteUrl()
 
   return {
     '@context': 'https://schema.org',
