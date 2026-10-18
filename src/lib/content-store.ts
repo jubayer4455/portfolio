@@ -64,6 +64,10 @@ export interface SiteSettingsData {
   admin_password_hash?: string
   admin_password_salt?: string
   admin_password_updated_at?: string
+
+  // Google Search Console & Analytics
+  google_site_verification?: string
+  google_analytics_id?: string
 }
 
 export interface SocialProfileData {
@@ -223,6 +227,8 @@ export async function getSiteSettings(): Promise<SiteSettingsData> {
           'admin_password_updated_at',
           'maintenance_title',
           'maintenance_message',
+          'google_site_verification',
+          'google_analytics_id',
         ]
         data.forEach((row: { key: string; value: string }) => {
           if (!row.key.endsWith('_json')) {

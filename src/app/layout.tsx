@@ -105,6 +105,9 @@ export async function generateMetadata(): Promise<Metadata> {
       apple: '/apple-touch-icon.png',
     },
     manifest: '/manifest.webmanifest',
+    verification: {
+      google: settings.google_site_verification || undefined,
+    },
   }
 }
 
@@ -138,6 +141,26 @@ export default async function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(schemas) }}
         />
+        {settings.google_analytics_id && (
+          <>
+            <script
+              async
+              src={`https://www.googletagmanager.com/gtag/js?id=${settings.google_analytics_id}`}
+            />
+            <script
+              dangerouslySetInnerHTML={{
+                __html: `
+                  window.dataLayer = window.dataLayer || [];
+                  function gtag(){dataLayer.push(arguments);}
+                  gtag('js', new Date());
+                  gtag('config', '${settings.google_analytics_id}', {
+                    page_path: window.location.pathname,
+                  });
+                `,
+              }}
+            />
+          </>
+        )}
       </head>
       <body className="bg-[#0a0a0a] text-[#fafafa] font-sans antialiased">
         <ThemeProvider>

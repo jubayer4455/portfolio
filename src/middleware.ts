@@ -7,6 +7,14 @@ export async function middleware(request: NextRequest) {
   // Refresh Supabase session and get supabase + response
   const { supabase, supabaseResponse } = await updateSession(request)
 
+  // Handle Google Search Console HTML verification files (e.g., /google1234567890abcdef.html)
+  if (pathname.match(/^\/google[a-zA-Z0-9_-]+\.html$/)) {
+    const filename = pathname.replace(/^\//, '')
+    return new NextResponse(`google-site-verification: ${filename}`, {
+      headers: { 'Content-Type': 'text/html; charset=utf-8' },
+    })
+  }
+
   // Protect /admin/** routes
   if (pathname.startsWith('/admin')) {
     // Allow /admin/login to pass through without auth check

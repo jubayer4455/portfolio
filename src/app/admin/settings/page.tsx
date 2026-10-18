@@ -37,6 +37,9 @@ import {
   AlertTriangle,
   Shield,
   Check,
+  Search,
+  BarChart2,
+  ExternalLink,
 } from 'lucide-react'
 import type { SiteSettingsData } from '@/lib/content-store'
 import { processAndCompressImage, uploadImageFile } from '@/lib/image-compress'
@@ -52,18 +55,20 @@ const defaultSettings: SiteSettingsData = {
   location: 'Dhaka, Bangladesh',
   quote_or_motto: 'Living passionately, capturing moments, and connecting with inspiring minds.',
   spotlight_title: 'Check out my latest Instagram Reels & Photos 📸',
-  spotlight_url: 'https://instagram.com',
+  spotlight_url: 'https://www.instagram.com/helllo.jubayer',
   spotlight_enabled: true,
-  whatsapp_number: '+8801700000000',
+  whatsapp_number: '+8801955541444',
   status_badge: 'Open to chats & new connections ✨',
   music_enabled: true,
   music_title: 'Lofi Sunset Chill 🎧',
   music_url: 'https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3',
-  contact_email: 'hello@jubayer.me',
+  contact_email: 'jubayerahmmed2k@gmail.com',
   bio_full_p1: "Hey there! I'm Abdul Al Jubayer, a passionate visual creator and lifestyle storyteller based in Dhaka, Bangladesh.",
   bio_full_p2: 'I believe every day holds a story waiting to be told. Whether I explore new places, capture aesthetic moments, or meet fascinating people, this space is where I share my personal journey.',
   seo_title: 'Abdul Al Jubayer — Official Bio & Social Hub',
   seo_description: 'Official link-in-bio and personal social hub of Abdul Al Jubayer. Connect on Instagram, Facebook, YouTube, TikTok, and explore photos.',
+  google_site_verification: '',
+  google_analytics_id: '',
 
   // Master Section Visibility Toggles
   gallery_enabled: true,
@@ -1251,6 +1256,100 @@ export default function AdminSettingsPage() {
               onChange={(e) => handleChange('seo_description', e.target.value)}
               className={inputClass}
             />
+          </div>
+        </div>
+
+        {/* 5.1 GOOGLE SEARCH CONSOLE & GOOGLE ANALYTICS */}
+        <div className="glass gradient-border rounded-2xl p-6 space-y-5 border-blue-500/30 bg-blue-500/[0.02]">
+          <div className="flex items-start justify-between gap-4 border-b border-white/[0.08] pb-4">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-400 border border-blue-500/30 flex items-center justify-center flex-shrink-0">
+                <Search size={20} />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-white font-bold text-lg">Google Search Console &amp; Analytics</h2>
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] font-semibold">
+                    AUTO-INDEXING READY
+                  </span>
+                </div>
+                <p className="text-white/40 text-xs mt-0.5">
+                  Verify your domain on Google Search Console and track live visitor analytics using Google Analytics 4 (GA4).
+                </p>
+              </div>
+            </div>
+
+            <div className="hidden sm:flex items-center gap-2">
+              <a
+                href="https://search.google.com/search-console"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[11px] text-blue-400 hover:text-blue-300 inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-blue-500/10 border border-blue-500/20 transition-colors"
+              >
+                <span>Search Console</span>
+                <ExternalLink size={11} />
+              </a>
+              <a
+                href="https://analytics.google.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[11px] text-orange-400 hover:text-orange-300 inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-orange-500/10 border border-orange-500/20 transition-colors"
+              >
+                <span>Analytics</span>
+                <ExternalLink size={11} />
+              </a>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            {/* Google Search Console Verification */}
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-white/60 text-xs font-medium uppercase tracking-wider">
+                  Google Search Console Verification Token / Meta Tag
+                </label>
+                <span className="text-[11px] text-white/30">HTML tag / Verification token</span>
+              </div>
+              <input
+                type="text"
+                value={settings.google_site_verification || ''}
+                onChange={(e) => handleChange('google_site_verification', e.target.value)}
+                placeholder="e.g. uKx7abc1234567890def or paste full meta tag"
+                className={inputClass}
+              />
+              <p className="text-[11px] text-white/40 mt-1.5 flex items-center gap-1.5">
+                <Check size={12} className="text-blue-400" />
+                <span>
+                  <strong>টিপস:</strong> গুগল সার্চ কনসোলে আপনার ডোমেইন অ্যাড করার পর প্রাপ্ত মেটা ট্যাগ বা ভেরিফিকেশন কোডটি এখানে পেস্ট করুন। এছাড়াও সাইটের রুট থেকে যেকোনো <code className="text-blue-300 bg-white/5 px-1 py-0.5 rounded">/google*.html</code> ফাইল অটোমেটিক ভেরিফাই হবে।
+                </span>
+              </p>
+            </div>
+
+            {/* Google Analytics 4 Measurement ID */}
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-white/60 text-xs font-medium uppercase tracking-wider">
+                  Google Analytics 4 (GA4) Measurement ID
+                </label>
+                <span className="text-[11px] text-orange-400 font-mono">G-XXXXXXXXXX</span>
+              </div>
+              <div className="relative">
+                <BarChart2 size={16} className="text-white/30 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  value={settings.google_analytics_id || ''}
+                  onChange={(e) => handleChange('google_analytics_id', e.target.value)}
+                  placeholder="G-XXXXXXXXXX"
+                  className={`${inputClass} pl-10`}
+                />
+              </div>
+              <p className="text-[11px] text-white/40 mt-1.5 flex items-center gap-1.5">
+                <Check size={12} className="text-orange-400" />
+                <span>
+                  গুগল অ্যানালিটিক্সে একটি প্রপার্টি তৈরি করে আপনার <strong>Measurement ID</strong> (যেমন: <code className="text-orange-300 bg-white/5 px-1 py-0.5 rounded">G-7XYZABC123</code>) দিলে সাথে সাথে সম্পূর্ণ সাইটে রিয়েল-টাইম ভিজিটর ট্র্যাকিং চালু হয়ে যাবে।
+                </span>
+              </p>
+            </div>
           </div>
         </div>
 

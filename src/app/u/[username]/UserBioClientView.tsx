@@ -17,6 +17,7 @@ import {
   ArrowLeft,
   LayoutGrid,
   List,
+  QrCode,
 } from 'lucide-react'
 import PlatformIcon from '@/components/common/PlatformIcon'
 import Bio3DBackground from '@/components/bio/Bio3DBackground'
@@ -24,6 +25,7 @@ import BioFlippableCard from '@/components/bio/BioFlippableCard'
 import UserAnonymousBox from '@/components/bio/UserAnonymousBox'
 import BioMiniMusicPlayer from '@/components/bio/BioMiniMusicPlayer'
 import BioWhatsAppDialog from '@/components/bio/BioWhatsAppDialog'
+import BioQrModal from '@/components/bio/BioQrModal'
 import type { UserBioData } from '@/lib/builder-store'
 
 interface Props {
@@ -66,6 +68,7 @@ const THEME_ACCENTS: Record<string, { glow: string; border: string; text: string
 export default function UserBioClientView({ bio }: Props) {
   const [activePhoto, setActivePhoto] = useState<{ url: string; caption?: string } | null>(null)
   const [copied, setCopied] = useState(false)
+  const [showQr, setShowQr] = useState(false)
   const [likes, setLikes] = useState<Record<string, number>>({})
   const [savedContact, setSavedContact] = useState(false)
 
@@ -201,23 +204,34 @@ export default function UserBioClientView({ bio }: Props) {
             <span>Platform</span>
           </Link>
 
-          <button
-            onClick={handleCopyLink}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full glass border border-white/10 text-xs text-white/80 hover:text-white hover:border-white/20 transition-all active:scale-95 shadow-md"
-            title="Share profile link"
-          >
-            {copied ? (
-              <>
-                <Check size={13} className="text-emerald-400" />
-                <span className="text-emerald-400 font-medium">Copied!</span>
-              </>
-            ) : (
-              <>
-                <Share2 size={13} />
-                <span>Share</span>
-              </>
-            )}
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowQr(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full glass border border-white/10 text-xs text-white/80 hover:text-white hover:border-white/20 transition-all active:scale-95 shadow-md"
+              title="Show Digital QR Code"
+            >
+              <QrCode size={13} className="text-orange-400" />
+              <span>QR Code</span>
+            </button>
+
+            <button
+              onClick={handleCopyLink}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full glass border border-white/10 text-xs text-white/80 hover:text-white hover:border-white/20 transition-all active:scale-95 shadow-md"
+              title="Share profile link"
+            >
+              {copied ? (
+                <>
+                  <Check size={13} className="text-emerald-400" />
+                  <span className="text-emerald-400 font-medium">Copied!</span>
+                </>
+              ) : (
+                <>
+                  <Share2 size={13} />
+                  <span>Share</span>
+                </>
+              )}
+            </button>
+          </div>
         </div>
 
         {/* 1. Solid Tactile Master Profile Card */}
@@ -423,6 +437,17 @@ export default function UserBioClientView({ bio }: Props) {
 
       {/* 1-Tap Direct WhatsApp Instant Chat Dialog */}
       <BioWhatsAppDialog bio={bio} />
+
+      {/* Digital Bio Profile QR Code Modal */}
+      <BioQrModal
+        isOpen={showQr}
+        onClose={() => setShowQr(false)}
+        profileUrl={typeof window !== 'undefined' ? window.location.href : `https://jubayer.me/u/${bio.username}`}
+        displayName={bio.display_name}
+        username={bio.username}
+        avatarUrl={bio.avatar_url}
+        accentColor={themeConfig.bg}
+      />
 
       {/* Bio Builder Promo Footer */}
       <footer className="w-full border-t border-white/[0.06] py-6 pb-12 safe-area-pb px-4 text-center mt-auto bg-[#050505] relative z-10">
