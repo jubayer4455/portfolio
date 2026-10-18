@@ -184,11 +184,11 @@ export default function UserBioClientView({ bio }: Props) {
 
       {/* Background ambient lighting */}
       <div
-        className="fixed top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] rounded-full pointer-events-none blur-3xl opacity-20 -z-10"
+        className="fixed top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] rounded-full pointer-events-none blur-3xl opacity-20 z-0"
         style={{ background: themeConfig.glow }}
       />
       <div
-        className="fixed bottom-0 right-1/4 w-[600px] h-[400px] rounded-full pointer-events-none blur-3xl opacity-10 -z-10"
+        className="fixed bottom-0 right-1/4 w-[600px] h-[400px] rounded-full pointer-events-none blur-3xl opacity-10 z-0"
         style={{ background: themeConfig.glow }}
       />
 

@@ -43,7 +43,7 @@ export interface UserBioData {
   whatsapp_number?: string
   whatsapp_message?: string
   whatsapp_status?: string
-  bg_3d_style?: 'particles' | 'orbit' | 'sculpture' | 'waves' | 'none'
+  bg_3d_style?: 'particles' | 'orbit' | 'sculpture' | 'waves' | 'matrix' | 'fireflies' | 'grid' | 'none'
   status_badge?: string
   music_enabled?: boolean
   music_title?: string

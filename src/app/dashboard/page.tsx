@@ -43,6 +43,7 @@ import {
 } from 'lucide-react'
 import PlatformIcon from '@/components/common/PlatformIcon'
 import BioInstagramStoryModal from '@/components/bio/BioInstagramStoryModal'
+import Bio3DBackground, { type Bio3DStyle } from '@/components/bio/Bio3DBackground'
 import type { UserBioData, UserSecretMessage } from '@/lib/builder-store'
 import { uploadImageFile } from '@/lib/image-compress'
 
@@ -77,12 +78,15 @@ const FONTS = [
   { id: 'mono', name: 'Cyber Mono', style: 'font-mono', desc: 'Tech & code inspired' },
 ]
 
-const BG_3D_STYLES = [
-  { id: 'particles', name: '3D Neon Dust', desc: 'Floating cosmic particles with mouse tilt parallax', icon: '✨' },
-  { id: 'orbit', name: 'Cosmic Gyro Rings', desc: 'Orbital rings rotating around glowing planetary core', icon: '🪐' },
-  { id: 'sculpture', name: '3D Wireframe Sculpture', desc: 'Rotating 3D cyber polygon sculpture', icon: '💎' },
-  { id: 'waves', name: 'Neon Wave Horizon', desc: 'Futuristic ambient wave ripples', icon: '🌊' },
-  { id: 'none', name: 'Pure Dark Glass', desc: 'Minimalist clean dark backdrop without 3D canvas', icon: '⬛' },
+const BG_3D_STYLES: Array<{ id: Bio3DStyle; name: string; desc: string; icon: string }> = [
+  { id: 'particles', name: '3D Neon Dust', desc: 'Floating cosmic particles with connecting constellation lines & mouse parallax', icon: '✨' },
+  { id: 'orbit', name: 'Cosmic Gyro Rings', desc: 'Concentric 3D glowing orbital rings rotating around radiant pulsar core', icon: '🪐' },
+  { id: 'sculpture', name: '3D Cyber Crystal', desc: 'Floating 3D wireframe geometric crystal with glowing vertices and faces', icon: '💎' },
+  { id: 'waves', name: 'Neon Cyber Waves', desc: 'Luminous multi-layered undulating neon wave horizon with crest pulses', icon: '🌊' },
+  { id: 'matrix', name: 'Cyber Matrix Rain', desc: 'Futuristic digital code rain streams cascading smoothly downward', icon: '⚡' },
+  { id: 'fireflies', name: 'Glowing Fireflies', desc: 'Soft floating bioluminescent orbs with warm breathing halos', icon: '🔥' },
+  { id: 'grid', name: 'Synthwave 3D Grid', desc: 'Retro-futuristic perspective cyber grid moving toward horizon', icon: '🌐' },
+  { id: 'none', name: 'Pure Dark Glass', desc: 'Minimalist clean deep dark backdrop without animation canvas', icon: '⬛' },
 ]
 
 const LAYOUT_STYLES = [
@@ -1320,7 +1324,7 @@ export default function UserDashboard() {
                     <h2 className="text-lg font-bold font-display text-white">3D Dynamic Canvas Background</h2>
                   </div>
                   <p className="text-white/40 text-xs mb-4">
-                    Immersive interactive 3D WebGL particle simulations rendered live on your bio page
+                    Immersive interactive 3D WebGL particle simulations rendered live on your bio page &amp; preview mockup
                   </p>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -1331,17 +1335,24 @@ export default function UserDashboard() {
                           key={bg.id}
                           type="button"
                           onClick={() => setBioData((p) => ({ ...p, bg_3d_style: bg.id as any }))}
-                          className={`p-4 rounded-2xl border text-left transition-all ${
+                          className={`p-4 rounded-2xl border text-left transition-all relative group ${
                             isSelected
-                              ? 'bg-white/[0.08] border-orange-500 shadow-lg shadow-orange-500/20'
-                              : 'bg-white/[0.02] border-white/10 hover:border-white/20'
+                              ? 'bg-white/[0.08] border-orange-500 shadow-lg shadow-orange-500/20 ring-1 ring-orange-500/50'
+                              : 'bg-white/[0.02] border-white/10 hover:border-white/20 hover:bg-white/[0.04]'
                           }`}
                         >
-                          <div className="flex items-center gap-2 mb-1.5">
-                            <span className="text-xl">{bg.icon}</span>
-                            <span className="text-xs font-semibold text-white">{bg.name}</span>
+                          <div className="flex items-center justify-between gap-2 mb-1.5">
+                            <div className="flex items-center gap-2">
+                              <span className="text-xl group-hover:scale-110 transition-transform">{bg.icon}</span>
+                              <span className="text-xs font-semibold text-white">{bg.name}</span>
+                            </div>
+                            {isSelected && (
+                              <span className="text-[9px] font-mono px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-400 border border-orange-500/30 font-medium shrink-0 animate-pulse">
+                                Live Active ✨
+                              </span>
+                            )}
                           </div>
-                          <p className="text-[10px] text-white/40 leading-relaxed">{bg.desc}</p>
+                          <p className="text-[10px] text-white/45 leading-relaxed">{bg.desc}</p>
                         </button>
                       )
                     })}
@@ -1691,11 +1702,19 @@ export default function UserDashboard() {
             {/* Phone Bezel */}
             <div className="w-full max-w-[360px] mx-auto rounded-[40px] border-4 border-white/15 bg-[#080808] p-3 shadow-2xl shadow-orange-500/10">
               <div
-                className={`w-full aspect-[9/18.5] rounded-[32px] overflow-y-auto bg-[#0a0a0a] p-4 border border-white/5 scrollbar-thin ${
+                className={`w-full aspect-[9/18.5] rounded-[32px] overflow-y-auto bg-[#0a0a0a] p-4 border border-white/5 scrollbar-thin relative ${
                   bioData.font_family === 'serif' ? 'font-serif' : bioData.font_family === 'mono' ? 'font-mono' : 'font-sans'
                 }`}
               >
-                {/* Header Cover Banner */}
+                {/* Real-time 3D Dynamic Animation Canvas in Preview Mockup */}
+                <Bio3DBackground
+                  style={bioData.bg_3d_style || 'particles'}
+                  glowColor={THEMES.find((t) => t.id === bioData.theme)?.color || '#F97316'}
+                  contained
+                />
+
+                <div className="relative z-10">
+                  {/* Header Cover Banner */}
                 <div className="relative w-full h-24 rounded-2xl overflow-hidden bg-white/5 border border-white/10 mb-[-40px]">
                   {bioData.cover_url ? (
                     <Image
@@ -1817,6 +1836,7 @@ export default function UserDashboard() {
                   <p className="text-[9px] text-white/30">Built with AJ Bio Builder 🚀</p>
                 </div>
               </div>
+            </div>
             </div>
           </div>
         </div>
