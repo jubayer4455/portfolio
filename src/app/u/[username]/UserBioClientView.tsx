@@ -442,7 +442,7 @@ export default function UserBioClientView({ bio }: Props) {
       <BioQrModal
         isOpen={showQr}
         onClose={() => setShowQr(false)}
-        profileUrl={typeof window !== 'undefined' ? window.location.href : `https://jubayer.me/u/${bio.username}`}
+        profileUrl={typeof window !== 'undefined' ? window.location.href : `https://hellojubayer.online/u/${bio.username}`}
         displayName={bio.display_name}
         username={bio.username}
         avatarUrl={bio.avatar_url}

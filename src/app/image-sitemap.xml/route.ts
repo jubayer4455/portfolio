@@ -19,7 +19,7 @@ function escapeXml(unsafe: string): string {
 }
 
 export async function GET() {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://jubayer.me'
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://hellojubayer.online'
 
   let settings: any = null
   let galleryItems: any[] = []

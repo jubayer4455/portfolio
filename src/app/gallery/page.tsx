@@ -174,7 +174,7 @@ async function getGalleryImages(): Promise<GalleryImage[]> {
 
 export default async function GalleryPage() {
   const [settings, images] = await Promise.all([getSiteSettings(), getGalleryImages()])
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://jubayer.me'
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://hellojubayer.online'
 
   const cookieStore = cookies()
   const isDemoAdmin = cookieStore.get('demo_admin')?.value === 'true'

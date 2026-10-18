@@ -130,7 +130,7 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const image = await getImageBySlug(params.slug)
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://jubayer.me'
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://hellojubayer.online'
 
   if (!image) {
     return { title: 'Image Not Found' }

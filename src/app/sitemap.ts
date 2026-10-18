@@ -2,7 +2,7 @@ import type { MetadataRoute } from 'next'
 import { getGalleryItems, getSiteSettings } from '@/lib/content-store'
 import { readAllUserBios } from '@/lib/builder-store'
 
-const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://jubayer.me'
+const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://hellojubayer.online'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date()

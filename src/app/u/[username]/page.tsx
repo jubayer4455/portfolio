@@ -26,7 +26,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     }
   }
 
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://jubayer.me'
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://hellojubayer.online'
   const title = `${bio.display_name} (@${bio.username}) — Official 3D Link in Bio`
   const description = bio.tagline || bio.bio || `Connect with ${bio.display_name} (@${bio.username}) across all social platforms, view photos, and chat.`
   const profileImages = [bio.avatar_url, bio.cover_url].filter(Boolean) as string[]
@@ -56,7 +56,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function UserBioPage({ params }: Props) {
   const cleanUser = decodeURIComponent(params.username || '').replace(/^@+/, '').trim()
   const bio = await getUserBioByUsername(cleanUser)
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://jubayer.me'
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://hellojubayer.online'
 
   if (!bio) {
     return (

@@ -210,7 +210,7 @@ export function generateImageObjectSchema(params: {
   uploadDate?: string
 }) {
   const author = params.authorName || DEFAULT_AUTHOR
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://jubayer.me'
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://hellojubayer.online'
 
   return {
     '@context': 'https://schema.org',
